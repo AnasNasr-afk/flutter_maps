@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "199041491527",
+    "project_id": "flutter-maps-44621",
+    "storage_bucket": "flutter-maps-44621.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:199041491527:android:0dbc17b775a162358b4762",
+        "android_client_info": {
+          "package_name": "com.example.flutter_maps"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBbswJFyR3NoLPQtAG3vRGDIis-YOKPx_M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
