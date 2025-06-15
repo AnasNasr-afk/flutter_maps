@@ -8,7 +8,6 @@ import 'package:flutter_maps/presentation/widgets/app_text_form_field.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../business_logic/issueCubit/issue_states.dart';
-import '../../business_logic/mapCubit/map_cubit.dart';
 import '../../helpers/color_manager.dart';
 import '../../helpers/text_styles.dart';
 
