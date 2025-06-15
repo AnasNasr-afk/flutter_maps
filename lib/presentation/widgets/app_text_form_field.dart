@@ -16,8 +16,12 @@ class AppTextFormField extends StatelessWidget {
   final String? prefixText;
   final bool? isObscureText;
   final Color? backgroundColor;
+  final bool? enabled;
+  final int? maxLines;
+  final int? minLines;
   final TextEditingController? controller;
   final TextInputType? textInputType;
+  final TextInputType? keyboardType;
   final ValueChanged<String>? onFieldSubmitted;
   final ValueChanged<String>? onChanged;
   final Function(String?) validator;
@@ -38,13 +42,17 @@ class AppTextFormField extends StatelessWidget {
     this.onChanged,
     this.textInputType,
     this.prefixText,
+    this.enabled,
+    this.maxLines,
+    this.keyboardType,
+    this.minLines,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
 
-      keyboardType: textInputType,
+      keyboardType: keyboardType,
       onChanged: onChanged,
       onFieldSubmitted: onFieldSubmitted,
       controller: controller,
@@ -56,6 +64,7 @@ class AppTextFormField extends StatelessWidget {
               horizontal: 20,
               vertical: 18,
             ),
+
         focusedBorder: focusedBorder ??
             OutlineInputBorder(
               borderSide: const BorderSide(
@@ -94,9 +103,12 @@ class AppTextFormField extends StatelessWidget {
         fillColor: backgroundColor ??
             Colors.white,
       ),
+      maxLines: maxLines,
+      minLines: minLines,
+
       obscureText: isObscureText ?? false,
       style: inputTextStyle ??
-          TextStyles.font14DarkBlueMedium,
+          TextStyles.font16BlackRegular,
       validator: (value){
         return validator(value);
       },
