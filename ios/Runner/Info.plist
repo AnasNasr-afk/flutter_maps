@@ -2,12 +2,14 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+    <!-- Allow Arbitrary Loads for Network Requests (Consider limiting in production) -->
     <key>NSAppTransportSecurity</key>
     <dict>
         <key>NSAllowsArbitraryLoads</key>
         <true/>
     </dict>
 
+    <!-- Firebase Auth URL Scheme -->
     <key>CFBundleURLTypes</key>
     <array>
         <dict>
@@ -17,24 +19,58 @@
             <string>firebase auth</string>
             <key>CFBundleURLSchemes</key>
             <array>
-                <string>app-1-199041491527-ios-c63a4a227bf45b108b4762</string> <!-- Replace with your actual Firebase URL scheme -->
+                <string>app-1-199041491527-ios-c63a4a227bf45b108b4762</string> <!-- Replace if needed -->
+            </array>
+        </dict>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>CFBundleURLName</key>
+            <string>comgooglemaps</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>comgooglemaps</string>
             </array>
         </dict>
     </array>
 
+    <!-- Permissions for Phone and Location Usage -->
     <key>NSPhoneNumberUsageDescription</key>
     <string>This app requires access to your phone number for verification.</string>
 
-    <!-- 📌 ADD LOCATION PERMISSIONS -->
     <key>NSLocationWhenInUseUsageDescription</key>
-    <string>We need your location to show your position on the map.</string>
+    <string>We use your location to show your current position on the map.</string>
 
     <key>NSLocationAlwaysUsageDescription</key>
-    <string>We need your location to provide accurate location services.</string>
+    <string>We use your location to provide accurate background location services.</string>
 
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>We need your location to enhance your experience.</string>
+    <string>We use your location for better navigation and map accuracy.</string>
 
+    <key>NSLocationUsageDescription</key>
+    <string>We use your location to provide relevant map features.</string>
+
+    <key>NSLocationTemporaryUsageDescriptionDictionary</key>
+    <dict>
+        <key>DefaultUsageDescription</key>
+        <string>We need your location to show your position on the map.</string>
+    </dict>
+
+    <!-- Camera and Photo Library Permissions -->
+    <key>NSCameraUsageDescription</key>
+    <string>This app needs access to the camera to take photos.</string>
+
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>This app needs access to your photo library to select photos.</string>
+
+    <key>NSMicrophoneUsageDescription</key>
+    <string>This app needs access to the microphone to record videos.</string>
+
+    <!-- Flutter Embedded Views Preview (Required for Google Maps Flutter) -->
+    <key>io.flutter.embedded_views_preview</key>
+    <true/>
+
+    <!-- App Configuration -->
     <key>CFBundleDevelopmentRegion</key>
     <string>$(DEVELOPMENT_LANGUAGE)</string>
 
@@ -62,12 +98,6 @@
     <key>CFBundleSignature</key>
     <string>????</string>
 
-    <key>LSApplicationQueriesSchemes</key>
-    <array>
-      <string>sms</string>
-      <string>tel</string>
-    </array>
-
     <key>CFBundleVersion</key>
     <string>$(FLUTTER_BUILD_NUMBER)</string>
 
@@ -80,6 +110,7 @@
     <key>UIMainStoryboardFile</key>
     <string>Main</string>
 
+    <!-- Supported Interface Orientations -->
     <key>UISupportedInterfaceOrientations</key>
     <array>
         <string>UIInterfaceOrientationPortrait</string>
@@ -95,10 +126,22 @@
         <string>UIInterfaceOrientationLandscapeRight</string>
     </array>
 
+    <!-- Minimum Frame Duration for iPhone -->
     <key>CADisableMinimumFrameDurationOnPhone</key>
     <true/>
 
+    <!-- Support for Indirect Input Events -->
     <key>UIApplicationSupportsIndirectInputEvents</key>
     <true/>
+
+    <!-- Allowed URL Schemes -->
+    <key>LSApplicationQueriesSchemes</key>
+    <array>
+        <string>sms</string>
+        <string>tel</string>
+        <string>googlechromes</string>
+        <string>comgooglemaps</string>
+    </array>
+
 </dict>
 </plist>

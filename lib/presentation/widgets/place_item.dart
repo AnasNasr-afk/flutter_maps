@@ -26,7 +26,7 @@ class PLaceItem extends StatelessWidget {
                   shape: BoxShape.circle, color: Colors.blue),
               child: const Icon(
                 Icons.place,
-                color: Colors.blue,
+                color: Colors.white,
               ),
             ),
             title: RichText(

@@ -2,8 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../business_logic/map_cubit.dart';
-import '../../business_logic/map_states.dart';
+import '../../business_logic/mapCubit/map_cubit.dart';
+import '../../business_logic/mapCubit/map_states.dart';
 import 'build_suggestions_list.dart';
 
 class BuildSuggestionsBloc extends StatelessWidget {
