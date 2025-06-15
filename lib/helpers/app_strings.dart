@@ -8,3 +8,6 @@ final RegExp passwordRegex = RegExp(
 
  const String suggestionBaseUrl = 'https://maps.googleapis.com/maps/api/place/autocomplete/json';
  const String placeLocationBaseUrl = 'https://maps.googleapis.com/maps/api/place/details/json';
+ const String userId = 'uid';
+
+  bool isLoggedIn = false;
