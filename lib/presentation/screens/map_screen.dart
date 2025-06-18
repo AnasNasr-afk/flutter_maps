@@ -1,18 +1,20 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_maps/business_logic/issueCubit/issue_cubit.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../business_logic/mapCubit/map_cubit.dart';
 import '../../business_logic/mapCubit/map_states.dart';
+import '../../helpers/components.dart';
 import '../../helpers/location_helper.dart';
+import '../../router/routes.dart';
+import '../widgets/build_drawer_item.dart';
 import '../widgets/map_legend_window.dart';
 import '../widgets/map_search_bar.dart';
 import '../widgets/map_selected_location_listener.dart';
-import '../widgets/report_issue_bottom_sheet.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -28,9 +30,6 @@ class _MapScreenState extends State<MapScreen> {
   Completer<GoogleMapController> controllerCompleter = Completer();
   bool _isLegendVisible = false;
 
-
-  // Set<Marker> markers = {};
-
   @override
   void initState() {
     super.initState();
@@ -38,8 +37,6 @@ class _MapScreenState extends State<MapScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       sessionToken = const Uuid().v4();
     });
-
-
   }
 
   Future<void> _initLocation() async {
@@ -72,10 +69,11 @@ class _MapScreenState extends State<MapScreen> {
         children: [
           if (cameraPosition != null)
             BlocBuilder<MapCubit, MapStates>(
-              buildWhen: (previous, current) =>
-                  current is MapMarkerState,
+              buildWhen: (previous, current) => current is MapMarkerState,
               builder: (context, state) {
                 return GoogleMap(
+                  // tiltGesturesEnabled: false,
+                  zoomControlsEnabled: false,
                   initialCameraPosition: cameraPosition!,
                   markers: state is MapMarkerState ? state.markers : {},
                   onMapCreated: (GoogleMapController controller) {
@@ -92,7 +90,7 @@ class _MapScreenState extends State<MapScreen> {
             ),
           MapSearchBar(onSuggestionSelected: (marker) {
             setState(() {
-              MapCubit.get(context).markers.add(marker);
+              MapCubit.get(context).addSearchMarker(marker);
             });
           }),
           Positioned(
@@ -116,7 +114,6 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-
                 if (_isLegendVisible)
                   Material(
                     elevation: 4,
@@ -137,7 +134,7 @@ class _MapScreenState extends State<MapScreen> {
       floatingActionButton: FloatingActionButton(
         heroTag: null,
         onPressed: () {
-          _showReportBottomSheet(context);
+          showReportBottomSheet(context);
         },
         backgroundColor: Colors.amber,
         child: const Icon(
@@ -148,42 +145,135 @@ class _MapScreenState extends State<MapScreen> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: const [
-            DrawerHeader(
-              decoration: BoxDecoration(color: Colors.amber),
-              child: Text('Menu'),
-            ),
-            ListTile(
-              leading: Icon(Icons.settings),
-              title: Text('Settings'),
-            ),
-            ListTile(
-              leading: Icon(Icons.info),
-              title: Text('About'),
-            ),
-          ],
+        backgroundColor: Colors.white,
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.amber, Colors.orange],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 8,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      FirebaseAuth.instance.currentUser?.displayName ?? 'User',
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                    Text(
+                      FirebaseAuth.instance.currentUser?.email ?? 'No email found',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.black54,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              BuildDrawerItem(
+                icon: Icons.report_problem_outlined,
+                title: 'Reported Issues',
+                onTap: () {
+                  Navigator.popAndPushNamed(context, Routes.userReportsScreen);
+                },
+              ),
+              BuildDrawerItem(
+                icon: Icons.notifications_active_outlined,
+                title: 'Notifications',
+                onTap: () {
+                  Navigator.popAndPushNamed(context, Routes.notificationsScreen);
+                },
+              ),
+              BuildDrawerItem(
+                icon: Icons.language,
+                title: 'Change Language',
+                onTap: () {},
+              ),
+
+              const SizedBox(height: 10),
+
+              // 🛠 Support & Account
+              BuildDrawerItem(
+                icon: Icons.support_agent,
+                title: 'Call Support',
+                onTap: () {
+                  callSupport(context);
+                },
+              ),
+              BuildDrawerItem(
+                icon: Icons.lock_outline,
+                title: 'Change Password',
+                onTap: () {},
+              ),
+              BuildDrawerItem(
+                icon: Icons.delete_forever,
+                title: 'Delete Account',
+                onTap: () {},
+              ),
+
+              const SizedBox(height: 10),
+
+              // ℹ️ Info
+              BuildDrawerItem(
+                icon: Icons.info_outline,
+                title: 'About App',
+                onTap: () {
+                  showModernAboutDialog(context);
+                },
+              ),
+
+              const Spacer(),
+              const Divider(),
+
+              // 🚪 Logout
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: ElevatedButton.icon(
+                  onPressed: ()  {
+                     //TODO logout refactoring
+                    logOut(context);
+                  },
+                  icon: const Icon(Icons.logout, color: Colors.white),
+                  label: const Text('Logout'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.redAccent,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 4,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  void _showReportBottomSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (bottomSheetContext) => BlocProvider.value(
-        value: BlocProvider.of<MapCubit>(context),
-        // ✅ Pass the existing MapCubit
-        child: BlocProvider(
-          create: (_) => IssueCubit(),
-          child: const ReportIssueBottomSheet(),
-        ),
-      ),
-    );
-  }
+
 }

@@ -34,20 +34,19 @@ class SignupCubit extends Cubit<SignupStates> {
         password: passwordController.text.trim(),
       );
 
+      // ✅ Set displayName for current user
+      await userCredential.user!.updateDisplayName(nameController.text.trim());
+      await userCredential.user!.reload();
+
+      // Create user model for Firestore
       UserModel user = UserModel(
         uid: userCredential.user!.uid,
         name: nameController.text.trim(),
         email: emailController.text.trim(),
       );
 
-      debugPrint("✅ User created: ${user.uid}");
-      debugPrint("📝 Saving user to Firestore...");
-      debugPrint("📌 User data to save: ${user.toMap()}");
-
-      // Save to Firestore
+      // Save user to Firestore
       await _firestore.collection("users").doc(user.uid).set(user.toMap());
-
-      debugPrint("✅ Firestore save complete");
 
       emit(SignupSuccessState());
       debugPrint("✅ Emitted SignupSuccessState");
@@ -60,4 +59,5 @@ class SignupCubit extends Cubit<SignupStates> {
       emit(SignupErrorState(e.toString()));
     }
   }
+
 }

@@ -205,7 +205,7 @@ class IssueCubit extends Cubit<IssueStates> {
 
 
       // ✅ ADD TO MAP CUBIT
-      MapCubit.get(context).addMarker(marker);
+      MapCubit.get(context).addSearchMarker(marker);
 
       // ✅ Reset state
       imageFile = null;
@@ -218,6 +218,7 @@ class IssueCubit extends Cubit<IssueStates> {
       emit(IssueSubmitFailureState('Failed to submit issue. Please try again.'));
     }
   }
+
 
 
 }

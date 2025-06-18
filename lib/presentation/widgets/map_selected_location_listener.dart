@@ -29,7 +29,7 @@ class MapSelectedLocationListener extends StatelessWidget {
               latLng: state.position,
               infoWindow: InfoWindow(title: state.description));
 
-          MapCubit.get(context).addMarker(marker);
+          MapCubit.get(context).addSearchMarker(marker);
           MapCubit.get(context).searchBarController.close();
           debugPrint("📍 Camera moved to: ${state.position}");
         }

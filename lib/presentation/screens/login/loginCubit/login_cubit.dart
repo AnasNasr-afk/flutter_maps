@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_maps/data/models/user_model.dart';
 import 'package:flutter_maps/helpers/app_strings.dart';
 import 'package:flutter_maps/helpers/shared_pref_helper.dart';
 
@@ -52,4 +51,5 @@ class LoginCubit extends Cubit<LoginStates> {
   Future<void> saveToken(String token) async {
     await SharedPrefHelper.setData(userId, token);
   }
+
 }

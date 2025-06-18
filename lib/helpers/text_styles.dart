@@ -26,6 +26,11 @@ class TextStyles {
     fontWeight: FontWeightHelper.semiBold,
     color: Colors.black,
   );
+  static TextStyle font14GreyRegular = const TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeightHelper.regular,
+    color: Colors.grey,
+  );
 
   static TextStyle font22BlackBold = const TextStyle(
     fontSize: 22,

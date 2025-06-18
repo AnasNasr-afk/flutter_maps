@@ -4,13 +4,20 @@ import 'package:flutter_maps/presentation/screens/signUp/signupCubit/signup_cubi
 import 'package:flutter_maps/presentation/screens/signUp/signupCubit/signup_states.dart';
 import 'package:flutter_maps/presentation/widgets/app_text_form_field.dart';
 
+import '../../../helpers/app_regex.dart';
 import '../../../helpers/text_styles.dart';
 import '../../../router/routes.dart';
 import '../../widgets/app_text_button.dart';
 
-class SignUpScreen extends StatelessWidget {
+class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
 
+  @override
+  State<SignUpScreen> createState() => _SignUpScreenState();
+}
+
+class _SignUpScreenState extends State<SignUpScreen> {
+  bool isObscured = false;
   @override
   Widget build(BuildContext context) {
     var cubit = SignupCubit.get(context);
@@ -39,95 +46,121 @@ class SignUpScreen extends StatelessWidget {
           body: Form(
             key: cubit.formKey,
             child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsetsDirectional.symmetric(horizontal: 40, vertical: 100),
-                child: Column(
-                  children: [
-                    const Align(
-                      alignment: Alignment.bottomLeft,
-                      child: Text(
-                        'Sign up ',
-                        style: TextStyle(fontSize: 25),
+              child: Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Create Account',
+                        style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 50),
-                    AppTextFormField(
-                      controller: cubit.nameController,
-                      hintText: 'Name',
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Enter a valid Name';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    AppTextFormField(
-                      controller: cubit.emailController,
-                      hintText: 'Email',
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Enter a valid email';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    AppTextFormField(
-                      controller: cubit.passwordController,
-                      hintText: 'Password',
-                      isObscureText: true,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Enter a valid password';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 50),
-                    // Show button or loading indicator depending on state
-                    isLoading
-                        ? const CircularProgressIndicator(color: Colors.blue)
-                        : AppTextButton(
-                      onPressed: () {
-                        if (cubit.formKey.currentState!.validate()) {
-                          cubit.userSignup();
-                        }
-                      },
-                      buttonStyle: const ButtonStyle(
-                        backgroundColor: WidgetStatePropertyAll(Colors.blue),
-                        shape: WidgetStatePropertyAll(
-                          ContinuousRectangleBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(20)),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Please fill in the details to sign up.',
+                        style: TextStyles.font14GreyRegular,
+                      ),
+                      const SizedBox(height: 32),
+                      AppTextFormField(
+                        controller: cubit.nameController,
+                        hintText: 'Full Name',
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your name';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      AppTextFormField(
+                        controller: cubit.emailController,
+                        hintText: 'Email Address',
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your email';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      AppTextFormField(
+                        maxLines: 1,
+                        hintText: 'Password',
+                        validator: (value) {
+                          if (value == null || value.isEmpty || !AppRegex.isPasswordValid(value)) {
+                            return 'Enter a valid password';
+                          }
+                          return null;
+                        },
+                        inputTextStyle: TextStyles.font15BlackRegular,
+                        controller: cubit.passwordController,
+                        backgroundColor: Colors.white,
+                        suffixIcon: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              isObscured = !isObscured;
+                            });
+                          },
+                          child: Icon(
+                            isObscured ? Icons.visibility_off : Icons.visibility,
                           ),
                         ),
-                        minimumSize: WidgetStatePropertyAll(Size(340, 50)),
+                        isObscureText: isObscured,
+                        onFieldSubmitted: (value){
+                          if (cubit.formKey.currentState!.validate()) {
+                            cubit.userSignup();
+                          }
+                        },
                       ),
-                      text: const Text(
-                        'Sign up',
-                        style: TextStyle(color: Colors.white, fontSize: 18),
-                      ),
-                    ),
-                    const SizedBox(height: 50),
-                    Row(
-                      children: [
-                        const Text('Already have an account? '),
-                        const Spacer(),
-                        InkWell(
-                          onTap: () {
-                            Navigator.pushReplacementNamed(context, Routes.loginScreen);
-                          },
-                          child: const Text(
-                            'Login',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline,
+                      const SizedBox(height: 32),
+                      isLoading
+                          ? const Center(child: CircularProgressIndicator(color: Colors.blue))
+                          : AppTextButton(
+                        onPressed: () {
+                          if (cubit.formKey.currentState!.validate()) {
+                            cubit.userSignup();
+                          }
+                        },
+                        buttonStyle: const ButtonStyle(
+                          backgroundColor: WidgetStatePropertyAll(Colors.blue),
+                          shape: WidgetStatePropertyAll(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(12)),
                             ),
                           ),
+                          minimumSize: WidgetStatePropertyAll(Size(double.infinity, 50)),
                         ),
-                      ],
-                    ),
-                  ],
+                        text: const Text(
+                          'Sign Up',
+                          style: TextStyle(color: Colors.white, fontSize: 18),
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text("Already have an account? "),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushReplacementNamed(context, Routes.loginScreen);
+                            },
+                            child: const Text(
+                              'Login',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blue,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

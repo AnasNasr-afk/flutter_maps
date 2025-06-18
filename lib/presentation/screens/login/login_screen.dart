@@ -5,40 +5,48 @@ import 'package:flutter_maps/presentation/screens/login/loginCubit/login_states.
 import 'package:flutter_maps/presentation/widgets/app_text_button.dart';
 import 'package:flutter_maps/presentation/widgets/app_text_form_field.dart';
 
+import '../../../helpers/app_regex.dart';
+import '../../../helpers/text_styles.dart';
 import '../../../router/routes.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  State<LoginScreen> createState() => _LoginScreenState();
+}
 
+class _LoginScreenState extends State<LoginScreen> {
+  bool isObscured = false;
+
+  @override
+  Widget build(BuildContext context) {
     var cubit = LoginCubit.get(context);
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsetsDirectional.symmetric(
-              horizontal: 40, vertical: 200),
-          child: Form(
-            key: cubit.formKey,
+        child: Form(
+          key: cubit.formKey,
+          child: Center(
             child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Align(
-                    alignment: Alignment.bottomLeft,
-                    child: Text(
-                      'Welcome back ',
-                      style: TextStyle(
-                        fontSize: 25,
-                      ),
-                    ),
+                  const Text(
+                    'Welcome Back',
+                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(
-                    height: 100,
+                  const SizedBox(height: 12),
+                  Text(
+                    'Please login to continue',
+                    style: TextStyles.font14GreyRegular,
                   ),
+                  const SizedBox(height: 32),
                   AppTextFormField(
                     controller: cubit.emailController,
+                    keyboardType: TextInputType.emailAddress,
                     hintText: 'Email Address',
                     validator: (value) {
                       if (value == null || value.isEmpty || !value.contains('@')) {
@@ -47,54 +55,65 @@ class LoginScreen extends StatelessWidget {
                       return null;
                     },
                   ),
-              
-                  const SizedBox(
-                    height: 40,
-                  ),
+                  const SizedBox(height: 20),
                   AppTextFormField(
-                    controller: cubit.passwordController,
-                    hintText: 'Password',
-
                     maxLines: 1,
+                    hintText: 'Enter your password',
                     validator: (value) {
-                      if (value == null || value.length < 6) {
-                        return 'Password must be at least 6 characters';
+                      if (value == null || value.isEmpty || !AppRegex.isPasswordValid(value)) {
+                        return 'Enter a valid password';
                       }
                       return null;
                     },
-                    suffixIcon: const Icon(Icons.visibility),
-                    isObscureText: true,
+                    inputTextStyle: TextStyles.font15BlackRegular,
+                    controller: cubit.passwordController,
+                    backgroundColor: Colors.white,
+                    suffixIcon: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          isObscured = !isObscured;
+                        });
+                      },
+                      child: Icon(
+                        isObscured ? Icons.visibility_off : Icons.visibility,
+                      ),
+                    ),
+                    isObscureText: isObscured,
+                    onFieldSubmitted: (value){
+                      if(LoginCubit.get(context).formKey.currentState!.validate()) {
+                        cubit.userLogin(context);
+                      }
+                    },
                   ),
-              
-                  const SizedBox(height: 40,),
+                  const SizedBox(height: 32),
                   BlocConsumer<LoginCubit, LoginStates>(
                     listener: (context, state) {
                       if (state is LoginLoadingState) {
-
                         showDialog(
                           context: context,
                           barrierDismissible: false,
-                          builder: (_) => const Center(child: CircularProgressIndicator(color: Colors.yellow,)),
+                          builder: (_) => const Center(
+                            child: CircularProgressIndicator(color: Colors.blue),
+                          ),
                         );
                       }
 
                       if (state is LoginSuccessState) {
-                        Navigator.pop(context); // remove the loading dialog
-                        // ScaffoldMessenger.of(context).showSnackBar(
-                        //   const SnackBar(content: Text("Login Successful")),
-                        // );
-                        Navigator.pushReplacementNamed(context, Routes.mapScreen); // navigate to home or wherever
+                        Navigator.pop(context); // close loading dialog
+                        Navigator.pushReplacementNamed(context, Routes.mapScreen);
                       }
 
                       if (state is LoginErrorState) {
-                        Navigator.pop(context); // remove the loading dialog
+                        Navigator.pop(context); // close loading dialog
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Login Failed. Please try again.")),
+                          const SnackBar(
+                            content: Text("Login failed. Please try again."),
+                            backgroundColor: Colors.red,
+                          ),
                         );
                       }
                     },
                     builder: (context, state) {
-                      var cubit = LoginCubit.get(context);
                       return AppTextButton(
                         onPressed: () {
                           if (cubit.formKey.currentState!.validate()) {
@@ -103,9 +122,12 @@ class LoginScreen extends StatelessWidget {
                         },
                         buttonStyle: const ButtonStyle(
                           backgroundColor: WidgetStatePropertyAll(Colors.blue),
-                          shape: WidgetStatePropertyAll(ContinuousRectangleBorder(
-                              borderRadius: BorderRadiusGeometry.all(Radius.circular(20)))),
-                          minimumSize: WidgetStatePropertyAll(Size(340, 50)),
+                          shape: WidgetStatePropertyAll(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(12)),
+                            ),
+                          ),
+                          minimumSize: WidgetStatePropertyAll(Size(double.infinity, 50)),
                         ),
                         text: const Text(
                           'Login',
@@ -114,27 +136,26 @@ class LoginScreen extends StatelessWidget {
                       );
                     },
                   ),
-
-
-                  const SizedBox(height: 50,),
-                   Row(
-                     children: [
-                       const Text('Don\'t have an account? '),
-                       const Spacer(),
-                       InkWell(
-                         onTap: (){
-                           Navigator.pushReplacementNamed(context, Routes.signUpScreen);
-                         },
-                         child: const Text('Sign Up' ,
-                         style:TextStyle(
-                             fontWeight: FontWeight.bold,
-                           decoration: TextDecoration.underline
-                         ),
-                         ),
-                       ),
-                     ],
-                   ),
-              
+                  const SizedBox(height: 32),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text("Don't have an account? "),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushReplacementNamed(context, Routes.signUpScreen);
+                        },
+                        child: const Text(
+                          'Sign Up',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),

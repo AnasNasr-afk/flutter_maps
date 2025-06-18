@@ -21,7 +21,9 @@ class MapCubit extends Cubit<MapStates> {
 
   static MapCubit get(context) => BlocProvider.of(context);
   final Completer<GoogleMapController> mapController = Completer();
-  final Set<Marker> markers = {};
+  final Set<Marker> _issueMarkers = {}; // From Firebase
+  final Set<Marker> _searchMarkers = {}; // From search bar  FloatingSearchBarController searchBarController = FloatingSearchBarController();
+  Set<Marker> get allMarkers => {..._issueMarkers, ..._searchMarkers};
   FloatingSearchBarController searchBarController = FloatingSearchBarController();
 
   void emitPlacesSuggestion(String places, String sessionToken) {
@@ -60,18 +62,24 @@ class MapCubit extends Cubit<MapStates> {
 
 
 
-
-
-  void addMarker(Marker marker) {
-    markers.add(marker);
-    emit(MapMarkerState(markers: markers));
+  void addSearchMarker(Marker marker) {
+    _searchMarkers
+      ..clear()
+      ..add(marker);
+    emit(MapMarkerState(markers: allMarkers));
   }
+  void clearSearchMarkers() {
+    _searchMarkers.clear();
+    emit(MapMarkerState(markers: allMarkers));
+  }
+
   Future<void> loadMarkersFromFirebase() async {
     debugPrint('[MapCubit] 🔄 Fetching markers from Firebase...');
 
     try {
       final snapshot = await FirebaseFirestore.instance.collection('issues').get();
       final Set<Marker> fetchedMarkers = {};
+
       debugPrint('[MapCubit] 📦 Total documents fetched: ${snapshot.docs.length}');
 
       for (var doc in snapshot.docs) {
@@ -82,23 +90,20 @@ class MapCubit extends Cubit<MapStates> {
         if (data.containsKey('lat') && data.containsKey('lng')) {
           lat = data['lat'];
           lng = data['lng'];
-          debugPrint('[MapCubit] ✅ Found lat/lng in doc ${doc.id}: ($lat, $lng)');
         } else if (data.containsKey('location')) {
           try {
-            final locationString = data['location'] as String;
-            final parts = locationString.split(',');
+            final parts = (data['location'] as String).split(',');
             if (parts.length == 2) {
               lat = double.tryParse(parts[0].trim());
               lng = double.tryParse(parts[1].trim());
-              debugPrint('[MapCubit] 🧠 Parsed from "location" in doc ${doc.id}: ($lat, $lng)');
             }
           } catch (e) {
-            debugPrint('[MapCubit] ⚠️ Error parsing location in doc ${doc.id}: $e');
+            debugPrint('[MapCubit] ⚠️ Failed to parse location in ${doc.id}');
           }
         }
 
         if (lat == null || lng == null) {
-          debugPrint('[MapCubit] ⛔ Skipping document ${doc.id} due to missing lat/lng');
+          debugPrint('[MapCubit] ⛔ Skipping invalid doc ${doc.id}');
           continue;
         }
 
@@ -115,11 +120,14 @@ class MapCubit extends Cubit<MapStates> {
         );
 
         fetchedMarkers.add(marker);
-        debugPrint('[MapCubit] 📍 Added marker for doc ${doc.id} at ($lat, $lng)');
       }
 
-      debugPrint('[MapCubit] ✅ Total valid markers: ${fetchedMarkers.length}');
-      emit(MapMarkerState(markers: fetchedMarkers));
+      _issueMarkers
+        ..clear()
+        ..addAll(fetchedMarkers);
+
+      emit(MapMarkerState(markers: allMarkers));
+      debugPrint('[MapCubit] ✅ Loaded ${_issueMarkers.length} issue markers.');
     } catch (e) {
       debugPrint('[MapCubit] ❌ Failed to load markers: $e');
       emit(MapErrorState());
