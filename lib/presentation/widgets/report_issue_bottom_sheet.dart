@@ -12,10 +12,7 @@ import '../../helpers/color_manager.dart';
 import '../../helpers/text_styles.dart';
 
 class ReportIssueBottomSheet extends StatefulWidget {
-
-
   const ReportIssueBottomSheet({super.key});
-
 
   @override
   State<ReportIssueBottomSheet> createState() => _ReportIssueBottomSheetState();
@@ -36,6 +33,7 @@ class _ReportIssueBottomSheetState extends State<ReportIssueBottomSheet> {
   Widget build(BuildContext context) {
     var cubit = IssueCubit.get(context);
     final theme = Theme.of(context);
+    final messenger = ScaffoldMessenger.of(context);
 
     return BlocListener<IssueCubit, IssueStates>(
       listener: (context, state) async {
@@ -262,7 +260,6 @@ class _ReportIssueBottomSheetState extends State<ReportIssueBottomSheet> {
                     const SizedBox(height: 16),
                     BlocBuilder<IssueCubit, IssueStates>(
                       builder: (context, state) {
-
                         final cubit = IssueCubit.get(context);
 
                         if (state is ImagePickerLoadingState) {
@@ -275,11 +272,14 @@ class _ReportIssueBottomSheetState extends State<ReportIssueBottomSheet> {
                         if (cubit.imageFile != null) {
                           return Column(
                             children: [
-                              Image.file(
-                                cubit.imageFile!,
-                                width: 300,
-                                height: 300,
-                                fit: BoxFit.cover,
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.file(
+                                  cubit.imageFile!,
+                                  width: 300,
+                                  height: 300,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                               const SizedBox(height: 16),
                               Row(
@@ -354,19 +354,22 @@ class _ReportIssueBottomSheetState extends State<ReportIssueBottomSheet> {
                           await cubit.fetchCurrentLocation();
 
                           if (cubit.currentPosition == null) {
-                            ScaffoldMessenger.of(context).showSnackBar(
+                            messenger.showSnackBar(
                               const SnackBar(
-                                content: Text('Failed to get location. Please enable location services.'),
-                              ),
+                                  content: Text(
+                                      'Failed to get location. Please enable location services.')),
                             );
                             return;
                           }
 
-                          final firebaseUser = FirebaseAuth.instance.currentUser;
+                          final firebaseUser =
+                              FirebaseAuth.instance.currentUser;
                           if (firebaseUser == null) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('User not logged in')),
+                            messenger.showSnackBar(
+                              const SnackBar(
+                                  content: Text('User not logged in')),
                             );
+
                             return;
                           }
 
@@ -377,23 +380,25 @@ class _ReportIssueBottomSheetState extends State<ReportIssueBottomSheet> {
                                 .get();
 
                             if (!userDoc.exists) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('User profile not found')),
+                              messenger.showSnackBar(
+                                const SnackBar(
+                                    content: Text('User profile not found')),
                               );
+
                               return;
                             }
 
-                            final userModel = UserModel.fromMap(userDoc.data()!);
+                            final userModel =
+                                UserModel.fromMap(userDoc.data()!);
 
                             await cubit.submitIssue(
                               context: context,
                               description: descriptionController.text.trim(),
                               currentUser: userModel,
                             );
-
                           } catch (e) {
                             debugPrint('❌ Failed to fetch user profile: $e');
-                            ScaffoldMessenger.of(context).showSnackBar(
+                            messenger.showSnackBar(
                               SnackBar(content: Text('Error: $e')),
                             );
                           }

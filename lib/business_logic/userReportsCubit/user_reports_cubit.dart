@@ -37,9 +37,14 @@ class UserReportsCubit extends Cubit<UserReportsStates>{
               userIssues.add({
                 'id': doc.id,
                 'category': data['category'],
+                'image': data['image'],
+                'status': data['status'],
+                'userName': data['userName'],
+                'userEmail': data['userEmail'],
                 'lat': lat,
                 'lng': lng,
                 'description': data['description'] ?? '',
+                'adminResolvedImage': data['adminResolvedImage'] ?? '',
               });
             }
           }

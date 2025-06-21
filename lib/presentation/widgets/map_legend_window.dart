@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../helpers/components.dart'; // ⬅️ Import where getStatusColor() is defined
 
 class MapLegendWindow extends StatelessWidget {
   const MapLegendWindow({super.key});
@@ -7,16 +8,16 @@ class MapLegendWindow extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final Map<String, Color> categoryDetails = {
-      'Trash': Colors.green,
-      'Broken Street Area': Colors.orange,
-      'Water Leak': Colors.blueAccent,
-      'Parking Issue': Colors.purple,
-      'Other': Colors.cyan,
+    final Map<String, Color> statusColors = {
+      'Search Marker': Colors.deepPurple, // default marker
+      'Pending': getStatusColor('pending'),
+      'In Progress': getStatusColor('inProgress'),
+      'Resolved': getStatusColor('resolved'),
+      'Rejected': getStatusColor('rejected'),
     };
 
     return Container(
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: isDark
             ? Colors.black.withValues(alpha: 0.85)
@@ -24,19 +25,17 @@ class MapLegendWindow extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color:
-                isDark ? Colors.white24 : Colors.black.withValues(alpha: 0.2),
-            blurRadius: 5,
+            color: isDark ? Colors.white24 : Colors.black26,
+            blurRadius: 6,
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: categoryDetails.entries.map((entry) {
+        children: statusColors.entries.map((entry) {
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 4),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
                   width: 14,
@@ -48,19 +47,14 @@ class MapLegendWindow extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(entry.key,
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.white : Colors.black,
-                          )),
-                    ],
+                Text(
+                  entry.key,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : Colors.black,
                   ),
-                )
+                ),
               ],
             ),
           );

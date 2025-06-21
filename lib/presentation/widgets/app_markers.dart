@@ -1,5 +1,10 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+
+import '../../helpers/components.dart';
+
 
 class AppMarkers {
   static Marker buildCurrentLocationMarker(Position position) {
@@ -21,7 +26,7 @@ class AppMarkers {
       markerId: markerId,
       position: latLng,
       infoWindow: infoWindow,
-      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueViolet),
     );
   }
 
@@ -59,24 +64,64 @@ class AppMarkers {
   }
 
 
-  static Marker buildIssueMarker({
-    required double latitude,
-    required double longitude,
-    required String category,
-    required String description,
-  }) {
-    final markerHue = getMarkerHue(category);
+  // static Marker buildIssueMarker({
+  //   required IssueModel issue,
+  //   required VoidCallback onTap,
+  // }) {
+  //   final markerHue = getMarkerHue(issue.category);
+  //
+  //   return Marker(
+  //     onTap: onTap,
+  //     position: _parseLatLng(issue.location),
+  //     markerId: MarkerId('issue_${issue.uId}_${DateTime.now().millisecondsSinceEpoch}'),
+  //     infoWindow: InfoWindow(
+  //       title: issue.category,
+  //       snippet: issue.description,
+  //     ),
+  //     icon: BitmapDescriptor.defaultMarkerWithHue(markerHue),
+  //   );
+  // }
+  // static LatLng _parseLatLng(String location) {
+  //   final parts = location.split(',');
+  //   return LatLng(double.parse(parts[0]), double.parse(parts[1]));
+  // }
 
-    return Marker(
-      position: LatLng(latitude, longitude),
-      markerId: MarkerId('issue_${DateTime.now().millisecondsSinceEpoch}'),
-      infoWindow: InfoWindow(
-        title: category,
-        snippet: description,
-      ),
-      icon: BitmapDescriptor.defaultMarkerWithHue(markerHue),
-    );
+
+
+
+  static Marker buildIssueMarker({
+  required double latitude,
+  required double longitude,
+  required String category,
+  required String description,
+  required String status, // ✅ Required for color
+  VoidCallback? onTap,
+  bool showInfoWindow = true,
+  }) {
+  final color = getStatusColor(status); // ✅ Get consistent status color
+
+  return Marker(
+  onTap: onTap,
+  position: LatLng(latitude, longitude),
+  markerId: MarkerId('issue_${DateTime.now().millisecondsSinceEpoch}'),
+  infoWindow: showInfoWindow
+  ? InfoWindow(title: category, snippet: description)
+      : InfoWindow.noText,
+  icon: BitmapDescriptor.defaultMarkerWithHue(_toHue(color)),
+  );
   }
+
+  // ✅ Converts Color to Google Maps marker hue
+  static double _toHue(Color color) {
+  // Map basic color identity to hues (limited by Google Maps API constraints)
+  if (color == Colors.green.shade600) return BitmapDescriptor.hueGreen;
+  if (color == Colors.blue.shade600) return BitmapDescriptor.hueBlue;
+  if (color == Colors.orange.shade600) return BitmapDescriptor.hueOrange;
+  if (color == Colors.redAccent.shade400) return BitmapDescriptor.hueRed;
+  return BitmapDescriptor.hueAzure; // fallback hue
+  }
+
+
 
 
 }

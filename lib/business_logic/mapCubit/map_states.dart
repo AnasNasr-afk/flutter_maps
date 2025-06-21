@@ -55,3 +55,7 @@ class MapMarkerState extends MapStates{
 }
 
 
+class MapAdminState extends MapStates {
+  final bool isAdmin;
+  MapAdminState(this.isAdmin);
+}

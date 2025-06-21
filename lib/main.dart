@@ -32,6 +32,7 @@ class MapsApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return MaterialApp(
       title: 'Flutter Maps',
       debugShowCheckedModeBanner: false,
