@@ -1,9 +1,11 @@
+// Keep all your imports
+import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import '../../business_logic/userReportsCubit/user_reports_cubit.dart';
 import '../../business_logic/userReportsCubit/user_reports_states.dart';
+import '../../data/models/issue_model.dart';
 
 class UserReportsScreen extends StatefulWidget {
   const UserReportsScreen({super.key});
@@ -12,25 +14,25 @@ class UserReportsScreen extends StatefulWidget {
   State<UserReportsScreen> createState() => _UserReportsScreenState();
 }
 
-
 class _UserReportsScreenState extends State<UserReportsScreen> {
-
   final userId = FirebaseAuth.instance.currentUser?.uid;
 
   @override
   void initState() {
     super.initState();
     if (userId != null) {
-      Future.microtask(() =>
-          context.read<UserReportsCubit>().loadUserReportedIssues(userId!));
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.read<UserReportsCubit>().loadUserReportedIssues(userId!);
+      });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     final userId = FirebaseAuth.instance.currentUser?.uid;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey[100],
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(70),
         child: Container(
@@ -40,13 +42,6 @@ class _UserReportsScreenState extends State<UserReportsScreen> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black26,
-                blurRadius: 8,
-                offset: Offset(0, 3),
-              ),
-            ],
             borderRadius: BorderRadius.only(
               bottomLeft: Radius.circular(20),
               bottomRight: Radius.circular(20),
@@ -65,10 +60,10 @@ class _UserReportsScreenState extends State<UserReportsScreen> {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-    await context
-        .read<UserReportsCubit>()
-        .loadUserReportedIssues(userId!);
-    },
+          if (userId != null) {
+            await context.read<UserReportsCubit>().loadUserReportedIssues(userId);
+          }
+        },
         child: BlocBuilder<UserReportsCubit, UserReportsStates>(
           builder: (context, state) {
             if (state is UserReportsLoadedState) {
@@ -79,100 +74,74 @@ class _UserReportsScreenState extends State<UserReportsScreen> {
               }
 
               return Padding(
-                padding: const EdgeInsets.all(20),
-                child: ListView.builder(
-                  physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(12),
+                child: ListView.separated(
                   itemCount: issues.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final issue = issues[index];
+                    final status = issue['status'] ?? 'pending';
+
                     return Card(
-                      margin: const EdgeInsets.symmetric(vertical: 10),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(18),
                       ),
-                      elevation: 5,
-                      color: Colors.grey[50],
+                      elevation: 4,
+                      color: Colors.white,
                       child: Padding(
                         padding: const EdgeInsets.all(16),
-                        child: Row(
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Leading Icon
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.orange.withValues(alpha: 0.1),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(Icons.warning_amber_rounded,
-                                  color: Colors.deepOrange, size: 30),
+                            /// Header
+                            Row(
+                              children: [
+                                buildSectionHeader('Category'),
+                                const Spacer(),
+                                buildStatusPill(status),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              issue['category'] ?? 'Unknown',
+                              style: const TextStyle(fontSize: 15),
                             ),
 
-                            const SizedBox(width: 16),
-
-                            // Main content
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Category title
-                                  Text(
-                                    issue['category'] ?? 'Unknown Issue',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-
-                                  const SizedBox(height: 6),
-
-                                  // Description
-                                  Text(
-                                    issue['description'] ?? 'No description provided.',
-                                    maxLines: 3,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
-
-                                  const SizedBox(height: 10),
-
-                                  // Status badge
-                                  Container(
-                                    padding:
-                                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: _getStatusColor(issue['status'] ?? 'Pending'),
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Text(
-                                      issue['status']?.toUpperCase() ?? 'PENDING',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                        letterSpacing: 0.5,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                            /// Description
+                            const SizedBox(height: 16),
+                            buildSectionHeader('Description'),
+                            const SizedBox(height: 6),
+                            Text(
+                              (issue['description']?.toString().trim().isNotEmpty ?? false)
+                                  ? issue['description']
+                                  : 'No description provided.',
+                              style: const TextStyle(fontSize: 14, height: 1.4),
                             ),
 
-                            // Trailing arrow
-                            IconButton(
-                              icon: const Icon(Icons.chevron_right),
-                              onPressed: () {
-                                // Navigate to detail view
-                              },
-                            ),
+                            /// Attached Image
+                            const SizedBox(height: 16),
+                            buildSectionHeader('Attached Image'),
+                            const SizedBox(height: 6),
+                            buildIssueImage(context, issue['image']?.toString()),
+
+                            /// Admin Resolved Image
+                            if (issue['adminResolvedImage'] != null) ...[
+                              const SizedBox(height: 16),
+                              buildSectionHeader('Resolved Image'),
+                              const SizedBox(height: 6),
+                              buildIssueImage(context, issue['adminResolvedImage']?.toString()),
+                            ],
+
+                            /// User Info
+                            const SizedBox(height: 16),
+                            buildSectionHeader('Submitted By'),
+                            const SizedBox(height: 6),
+                            Text('Name: ${issue['userName']?.toString().isNotEmpty == true ? issue['userName'] : 'Unknown'}'),
+                            Text('Email: ${issue['userEmail']?.toString().isNotEmpty == true ? issue['userEmail'] : 'Unknown'}'),
                           ],
                         ),
                       ),
                     );
-
                   },
                 ),
               );
@@ -186,16 +155,89 @@ class _UserReportsScreenState extends State<UserReportsScreen> {
       ),
     );
   }
-}
-Color _getStatusColor(String status) {
-  switch (status.toLowerCase()) {
-    case 'resolved':
-      return Colors.green;
-    case 'in progress':
-      return Colors.blue;
-    case 'rejected':
-      return Colors.redAccent;
-    default:
-      return Colors.orange;
+
+  Widget buildSectionHeader(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+        fontSize: 15,
+        fontWeight: FontWeight.w600,
+        color: Colors.black87,
+      ),
+    );
+  }
+
+  Widget buildStatusPill(String status) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: getStatusColor(status),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Text(
+        IssueStatusExtension.fromString(status).label,
+        style: const TextStyle(color: Colors.white, fontSize: 12),
+      ),
+    );
+  }
+
+  Color getStatusColor(String status) {
+    return IssueStatusExtension.fromString(status).color;
+  }
+
+  Widget buildIssueImage(BuildContext context, String? image) {
+    if (image == null || image.isEmpty) {
+      return const Text(
+        'No image available',
+        style: TextStyle(color: Colors.grey),
+      );
+    }
+
+    Widget imageWidget;
+
+    try {
+      final bytes = base64Decode(image);
+      imageWidget = Image.memory(
+        bytes,
+        height: 200,
+        width: double.infinity,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => const Text(
+          'Failed to load image',
+          style: TextStyle(color: Colors.red),
+        ),
+      );
+    } catch (e) {
+      imageWidget = Image.network(
+        image,
+        height: 200,
+        width: double.infinity,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => const Text(
+          'Failed to load image',
+          style: TextStyle(color: Colors.red),
+        ),
+      );
+    }
+
+    return GestureDetector(
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (_) => Dialog(
+            backgroundColor: Colors.transparent,
+            insetPadding: const EdgeInsets.all(12),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: imageWidget,
+            ),
+          ),
+        );
+      },
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: imageWidget,
+      ),
+    );
   }
 }

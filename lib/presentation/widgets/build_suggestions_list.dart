@@ -6,10 +6,10 @@ import 'package:uuid/uuid.dart';
 import '../../business_logic/mapCubit/map_cubit.dart';
 
 class BuildSuggestionsList extends StatelessWidget {
-  List<PlaceSuggestionModel> placeSuggestions;
-  PlaceDetailsModel? placeDetailsModel;
+  final List<PlaceSuggestionModel> placeSuggestions;
+  final PlaceDetailsModel? placeDetailsModel;
 
-  BuildSuggestionsList({
+  const BuildSuggestionsList({
     super.key,
     required this.placeSuggestions,
     this.placeDetailsModel,

@@ -1,27 +1,26 @@
+import 'dart:convert';
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_maps/business_logic/issueCubit/issue_states.dart';
 import 'package:flutter_maps/data/models/issue_model.dart';
 import 'package:flutter_maps/data/models/user_model.dart';
+import 'package:flutter_maps/presentation/widgets/app_markers.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-
-import '../../presentation/widgets/app_markers.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import '../mapCubit/map_cubit.dart';
 
 class IssueCubit extends Cubit<IssueStates> {
-
-
   IssueCubit() : super(IssueInitialState());
 
   static IssueCubit get(context) => BlocProvider.of(context);
 
   File? imageFile;
+  File? resolvedImageFile;
   ImagePicker imagePicker = ImagePicker();
   String? selectedCategory;
   Position? currentPosition;
@@ -35,7 +34,13 @@ class IssueCubit extends Cubit<IssueStates> {
     'Other',
   ];
 
-  // --- Image Picker ---
+  // --- Select Category ---
+  void selectCategory(String? category) {
+    selectedCategory = category;
+    emit(IssueInitialState()); // Trigger UI update
+  }
+
+
   Future<void> imagePickerPhoto(ImageSource imageSource) async {
     emit(ImagePickerLoadingState());
     try {
@@ -129,12 +134,13 @@ class IssueCubit extends Cubit<IssueStates> {
     }
   }
 
-
   Future<void> submitIssue({
     required BuildContext context,
     required String description,
     required UserModel currentUser,
   }) async {
+    final cubit = MapCubit.get(context);
+
     if (selectedCategory == null) {
       emit(IssueSubmitFailureState('Please select a category'));
       return;
@@ -159,17 +165,11 @@ class IssueCubit extends Cubit<IssueStates> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text(
-                'Yes',
-              style: TextStyle(color: Colors.black),
-            ),
+            child: const Text('Yes', style: TextStyle(color: Colors.black)),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text(
-                'No',
-              style: TextStyle(color: Colors.black),
-            ),
+            child: const Text('No', style: TextStyle(color: Colors.black)),
           ),
         ],
       ),
@@ -181,17 +181,53 @@ class IssueCubit extends Cubit<IssueStates> {
 
     final locationLat = currentPosition!.latitude;
     final locationLng = currentPosition!.longitude;
+    final locationString = '$locationLat,$locationLng';
 
     try {
-      final currentLocation = '$locationLat,$locationLng';
+      String imageValue;
+
+      // Compress and encode image to Base64
+      try {
+        final tempDir = Directory.systemTemp;
+        final compressedPath = '${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}_compressed.jpg';
+
+        final compressedImage = await FlutterImageCompress.compressAndGetFile(
+          imageFile!.path,
+          compressedPath,
+          quality: 50,
+          minWidth: 800,
+          minHeight: 600,
+        );
+
+        if (compressedImage == null) {
+          throw Exception('Image compression failed');
+        }
+
+        final imageBytes = await compressedImage.readAsBytes();
+        final imageSizeKB = imageBytes.length / 1024;
+        if (imageSizeKB > 750) {
+          debugPrint('Compressed image size: ${imageSizeKB}KB, may exceed Firestore limit');
+          emit(IssueSubmitFailureState('Image too large after compression. Try a smaller image.'));
+          return;
+        }
+
+        imageValue = base64Encode(imageBytes);
+        await File(compressedImage.path).delete();
+      } catch (e) {
+        debugPrint('Image compression/encoding failed: $e');
+        emit(IssueSubmitFailureState('Failed to process image. Please try a smaller image.'));
+        return;
+      }
 
       final issue = IssueModel(
         userName: currentUser.name,
         uId: currentUser.uid,
         category: selectedCategory!,
         description: description,
-        location: currentLocation,
-        image: imageFile!.path,
+        location: locationString,
+        image: imageValue,
+        userEmail: currentUser.email,
+        status: IssueStatus.pending,
       );
 
       await FirebaseFirestore.instance.collection('issues').add(issue.toJson());
@@ -201,13 +237,11 @@ class IssueCubit extends Cubit<IssueStates> {
         longitude: locationLng,
         category: selectedCategory!,
         description: description,
+        showInfoWindow: !cubit.isAdminChecked,
+        status: issue.status.name, // ✅ Use consistent status color
       );
+      cubit.addSearchMarker(marker);
 
-
-      // ✅ ADD TO MAP CUBIT
-      MapCubit.get(context).addSearchMarker(marker);
-
-      // ✅ Reset state
       imageFile = null;
       selectedCategory = null;
       currentPosition = null;
@@ -219,9 +253,91 @@ class IssueCubit extends Cubit<IssueStates> {
     }
   }
 
+  Future<void> updateIssueStatus(String docId, String newStatus, {File? adminImage}) async {
+    emit(UpdateIssueLoadingState());
 
+    try {
+      String? imageBase64;
+
+      if (adminImage != null) {
+        final tempDir = Directory.systemTemp;
+        final compressedPath = '${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}_compressed.jpg';
+
+        final compressedImage = await FlutterImageCompress.compressAndGetFile(
+          adminImage.path,
+          compressedPath,
+          quality: 20, // 🔽 Lower = better compression
+          minWidth: 640,
+          minHeight: 480,
+        );
+
+        if (compressedImage == null) {
+          debugPrint('❌ Admin image compression failed');
+          emit(UpdateIssueErrorState('Failed to compress image.'));
+          return;
+        }
+
+        final bytes = await compressedImage.readAsBytes();
+        final imageSizeKB = bytes.length / 1024;
+        debugPrint('✅ Admin image encoded. Size: ${imageSizeKB.toStringAsFixed(2)} KB');
+
+        if (imageSizeKB > 950) {
+          debugPrint('❌ Compressed image too large: ${imageSizeKB.toStringAsFixed(2)} KB');
+          emit(UpdateIssueErrorState('Image too large even after compression. Try a smaller image.'));
+          return;
+        }
+
+        imageBase64 = base64Encode(bytes);
+
+        await File(compressedImage.path).delete(); // Clean up
+      }
+
+      final dataToUpdate = {
+        'status': newStatus,
+        if (imageBase64 != null) 'adminResolvedImage': imageBase64,
+      };
+
+      debugPrint('📄 Document ID: $docId');
+      debugPrint('🆕 New status: $newStatus');
+      debugPrint('📤 Sending data to Firestore: $dataToUpdate');
+
+      await FirebaseFirestore.instance
+          .collection('issues')
+          .doc(docId)
+          .update(dataToUpdate);
+
+      emit(UpdateIssueSuccessState());
+    } catch (e) {
+      debugPrint('❌ Firestore update failed: $e');
+      emit(UpdateIssueErrorState(e.toString()));
+    }
+  }
+
+
+
+
+  Future<void> pickResolvedImage(ImageSource imageSource) async {
+    emit(ResolvedImagePickerLoadingState());
+    try {
+      var pickedFile = await imagePicker.pickImage(source: imageSource);
+      if (pickedFile != null) {
+        resolvedImageFile = File(pickedFile.path);
+        debugPrint('Resolved image selected: ${pickedFile.path}');
+        emit(ResolvedImagePickerSuccessState());
+      } else {
+        debugPrint('Picked file is empty');
+        emit(ResolvedImagePickerErrorState('No image selected'));
+      }
+    } catch (e) {
+      debugPrint('Error picking resolved image: $e');
+      emit(ResolvedImagePickerErrorState(e.toString()));
+    }
+  }
+
+  void clearResolvedImage() {
+    resolvedImageFile = null;
+    emit(ResolvedImagePickerSuccessState());
+  }
 
 }
-
-
 

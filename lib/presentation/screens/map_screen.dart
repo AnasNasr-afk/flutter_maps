@@ -64,6 +64,8 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final cubit = MapCubit.get(context);
+    cubit.setContext(context); // 🧠 this is the fix
     return Scaffold(
       body: Stack(
         children: [
@@ -71,11 +73,15 @@ class _MapScreenState extends State<MapScreen> {
             BlocBuilder<MapCubit, MapStates>(
               buildWhen: (previous, current) => current is MapMarkerState,
               builder: (context, state) {
+
+   // TODO if user is an admin on doubleTap on marker : direction from location to marker is drawn
+
                 return GoogleMap(
-                  // tiltGesturesEnabled: false,
                   zoomControlsEnabled: false,
                   initialCameraPosition: cameraPosition!,
-                  markers: state is MapMarkerState ? state.markers : {},
+                  markers: state is MapMarkerState ? state.markers : {
+
+                  },
                   onMapCreated: (GoogleMapController controller) {
                     if (!controllerCompleter.isCompleted) {
                       controllerCompleter.complete(controller);
@@ -131,18 +137,69 @@ class _MapScreenState extends State<MapScreen> {
           const MapSelectedLocationListener(),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: null,
-        onPressed: () {
-          showReportBottomSheet(context);
+      //TODO if user is an admin :
+      // remove the add icon and later switch to analysis icon ,
+      // onTap on marker :
+      // bottom sheet is opened with the data of the issue
+      // {
+      // category,description,
+      // image,name of the user,mail of the user,status of the issue }
+      floatingActionButton: BlocBuilder<MapCubit, MapStates>(
+        builder: (context, state) {
+          final cubit = MapCubit.get(context);
+
+          if (!cubit.isAdminChecked) {
+            return FloatingActionButton(
+              onPressed: () {},
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              child: TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0.0, end: 24.0),
+                duration: const Duration(milliseconds: 600),
+                curve: Curves.easeInOut,
+                builder: (context, size, child) {
+                  return SizedBox(
+                    height: size,
+                    width: size,
+                    child: const CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                    ),
+                  );
+                },
+              ),
+            );
+          }
+
+          if (cubit.isAdmin) {
+            return FloatingActionButton(
+              backgroundColor: Colors.amber,
+              onPressed: () {
+                // admin logic
+              },
+              child: const Icon(
+                Icons.analytics_outlined,
+                color: Colors.black,
+                size: 30,
+              ),
+            );
+          } else {
+            return FloatingActionButton(
+              heroTag: null,
+              onPressed: () {
+                showReportBottomSheet(context);
+              },
+              backgroundColor: Colors.amber,
+              child: const Icon(
+                Icons.add,
+                size: 30,
+                color: Colors.black,
+              ),
+            );
+          }
         },
-        backgroundColor: Colors.amber,
-        child: const Icon(
-          Icons.add,
-          size: 30,
-          color: Colors.black,
-        ),
       ),
+
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       drawer: Drawer(
         backgroundColor: Colors.white,

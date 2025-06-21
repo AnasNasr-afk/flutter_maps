@@ -10,6 +10,7 @@ class MapSelectedLocationListener extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cubit = MapCubit.get(context);
     return BlocListener<MapCubit, MapStates>(
       listener: (context, state) async {
         if (state is MapPlaceSelectedState) {
@@ -28,9 +29,8 @@ class MapSelectedLocationListener extends StatelessWidget {
               markerId: const MarkerId('selected-location'),
               latLng: state.position,
               infoWindow: InfoWindow(title: state.description));
-
-          MapCubit.get(context).addSearchMarker(marker);
-          MapCubit.get(context).searchBarController.close();
+          cubit.addSearchMarker(marker);
+          cubit.searchBarController.close();
           debugPrint("📍 Camera moved to: ${state.position}");
         }
       },

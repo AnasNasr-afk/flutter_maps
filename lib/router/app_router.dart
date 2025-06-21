@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_maps/business_logic/authCubit/auth_cubit.dart';
 import 'package:flutter_maps/business_logic/mapCubit/map_cubit.dart';
 import 'package:flutter_maps/data/repository/maps_repo.dart';
 import 'package:flutter_maps/data/webService/web_service.dart';
