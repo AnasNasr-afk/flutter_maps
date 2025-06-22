@@ -7,12 +7,17 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:199041491527:android:0dbc17b775a162358b4762",
+        "mobilesdk_app_id": "1:199041491527:android:b7441a0df8a21a048b4762",
         "android_client_info": {
-          "package_name": "com.example.flutter_maps"
+          "package_name": "com.anasnasr.flutter_maps"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "199041491527-eucfkgomn7rej6vatvhsc5vkoov1e9ta.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBbswJFyR3NoLPQtAG3vRGDIis-YOKPx_M"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "199041491527-eucfkgomn7rej6vatvhsc5vkoov1e9ta.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "199041491527-m787asbd1oohc9nr9bpagr8j8jvnb2dq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.flutterMaps"
+              }
+            }
+          ]
         }
       }
     }

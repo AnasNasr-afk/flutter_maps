@@ -18,7 +18,7 @@ class AdminIssueBottomSheet extends StatefulWidget {
   final String status;
   final String docId;
   final String? adminResolvedImage;
-  final VoidCallback? onGetDirections;
+  final VoidCallback onGetDirections;
 
   const AdminIssueBottomSheet({
     super.key,
@@ -30,7 +30,7 @@ class AdminIssueBottomSheet extends StatefulWidget {
     required this.status,
     required this.docId,
     this.adminResolvedImage,
-    this.onGetDirections,
+    required this.onGetDirections,
   });
 
   @override
@@ -51,10 +51,14 @@ class _AdminIssueBottomSheetState extends State<AdminIssueBottomSheet>
     'rejected'
   ];
 
-  bool get hasResolvedImage => IssueCubit.get(context).resolvedImageFile != null || (widget.adminResolvedImage != null && widget.adminResolvedImage!.isNotEmpty);
+  bool get hasResolvedImage =>
+      IssueCubit.get(context).resolvedImageFile != null ||
+          (widget.adminResolvedImage != null &&
+              widget.adminResolvedImage!.isNotEmpty);
 
   Uint8List? get resolvedImageBytes {
-    if (widget.adminResolvedImage == null || widget.adminResolvedImage!.isEmpty) return null;
+    if (widget.adminResolvedImage == null ||
+        widget.adminResolvedImage!.isEmpty) return null;
     try {
       return base64Decode(widget.adminResolvedImage!);
     } catch (_) {
@@ -87,20 +91,22 @@ class _AdminIssueBottomSheetState extends State<AdminIssueBottomSheet>
     final theme = Theme.of(context);
 
     return BlocConsumer<IssueCubit, IssueStates>(
-
       listener: (context, state) {
         if (state is UpdateIssueSuccessState) {
-          context.read<MapCubit>().refreshMarkers();
-          setState(() => _isSaving = false);
-          Navigator.pop(context);
+          if (context.mounted) {
+            context.read<MapCubit>().refreshMarkers();
+            setState(() => _isSaving = false);
+            Navigator.pop(context);
+          }
         } else if (state is UpdateIssueErrorState) {
-          setState(() => _isSaving = false);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: ${state.errorMessage}')),
-          );
+          if (context.mounted) {
+            setState(() => _isSaving = false);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Error: ${state.errorMessage}')),
+            );
+          }
         }
       },
-
       builder: (context, state) {
         return DraggableScrollableSheet(
           initialChildSize: 0.85,
@@ -113,8 +119,9 @@ class _AdminIssueBottomSheetState extends State<AdminIssueBottomSheet>
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.white.withAlpha(220),
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-                  border: Border.all(color: Colors.white.withAlpha(50), width: 1),
+                  borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(24)),
+                  border: Border.all(color: Colors.white.withAlpha(50)),
                 ),
                 child: SingleChildScrollView(
                   controller: scrollController,
@@ -123,6 +130,8 @@ class _AdminIssueBottomSheetState extends State<AdminIssueBottomSheet>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       buildHandle(),
+
+                      // Category
                       buildSection(
                         context,
                         title: 'Category',
@@ -139,6 +148,8 @@ class _AdminIssueBottomSheetState extends State<AdminIssueBottomSheet>
                           ),
                         ),
                       ),
+
+                      // Description
                       buildSection(
                         context,
                         title: 'Description',
@@ -153,6 +164,8 @@ class _AdminIssueBottomSheetState extends State<AdminIssueBottomSheet>
                           ),
                         ),
                       ),
+
+                      // Image
                       buildSection(
                         context,
                         title: 'Attached Image',
@@ -161,6 +174,8 @@ class _AdminIssueBottomSheetState extends State<AdminIssueBottomSheet>
                             ? buildImage(context, widget.imagePath)
                             : buildErrorImage(),
                       ),
+
+                      // User info
                       buildSection(
                         context,
                         title: 'Submitted By',
@@ -174,12 +189,16 @@ class _AdminIssueBottomSheetState extends State<AdminIssueBottomSheet>
                           ],
                         ),
                       ),
+
+                      // Status display
                       buildSection(
                         context,
                         title: 'Current Status',
                         animation: _fadeAnimation,
                         child: buildStatusPill(_selectedStatus),
                       ),
+
+                      // Status change
                       buildSection(
                         context,
                         title: 'Change Status',
@@ -218,77 +237,76 @@ class _AdminIssueBottomSheetState extends State<AdminIssueBottomSheet>
                           }).toList(),
                         ),
                       ),
-                      if (_selectedStatus == 'resolved')
-                        ...[
-                          const SizedBox(height: 16),
-                          buildSection(
-                            context,
-                            title: 'Resolution Image',
-                            icon: Icons.image_outlined,
-                            animation: _fadeAnimation,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(16),
-                              child: cubit.resolvedImageFile != null
-                                  ? Image.file(
-                                cubit.resolvedImageFile!,
-                                height: 220,
-                                width: double.infinity,
-                                fit: BoxFit.cover,
-                              )
-                                  : hasResolvedImage
-                                  ? Image.memory(
-                                resolvedImageBytes!,
-                                height: 220,
-                                width: double.infinity,
-                                fit: BoxFit.cover,
-                              )
-                                  : buildErrorImage(),
+
+                      // If resolved, show image section
+                      if (_selectedStatus == 'resolved') ...[
+                        const SizedBox(height: 16),
+                        buildSection(
+                          context,
+                          title: 'Resolution Image',
+                          icon: Icons.image_outlined,
+                          animation: _fadeAnimation,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: cubit.resolvedImageFile != null
+                                ? Image.file(
+                              cubit.resolvedImageFile!,
+                              height: 220,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            )
+                                : hasResolvedImage
+                                ? Image.memory(
+                              resolvedImageBytes!,
+                              height: 220,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            )
+                                : buildErrorImage(),
+                          ),
+                        ),
+                        if (cubit.resolvedImageFile == null && !hasResolvedImage)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                cubit.pickResolvedImage(ImageSource.gallery);
+                              },
+                              icon: const Icon(Icons.upload, color: Colors.white),
+                              label: const Text(
+                                'Upload Resolution Image',
+                                style: TextStyle(fontSize: 16, color: Colors.white),
+                              ),
+                              style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
                             ),
                           ),
-                          if (cubit.resolvedImageFile == null && !hasResolvedImage)
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              child: ElevatedButton.icon(
-                                onPressed: () {
-                                  cubit.pickResolvedImage(ImageSource.gallery);
-                                },
-                                icon: const Icon(Icons.upload, color: Colors.white),
-                                label: const Text(
-                                  'Upload Resolution Image',
-                                  style: TextStyle(fontSize: 16, color: Colors.white),
+                        if (cubit.resolvedImageFile != null)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  backgroundColor: Colors.grey.shade300,
                                 ),
-                                style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
+                                onPressed: () => cubit.pickResolvedImage(ImageSource.gallery),
+                                child: const Text('Reselect Image', style: TextStyle(fontSize: 14)),
                               ),
-                            ),
-                          if (cubit.resolvedImageFile != null)
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                    backgroundColor: Colors.grey.shade300,
-                                  ),
-                                  onPressed: () => cubit.pickResolvedImage(ImageSource.gallery),
-                                  child: const Text('Reselect Image' , style:
-                                    TextStyle(fontSize: 14 , color: Colors.black87)
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                ElevatedButton(
+                              const SizedBox(width: 12),
+                              ElevatedButton(
+                                onPressed: () => cubit.clearResolvedImage(),
+                                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                                child: const Text('Delete', style: TextStyle(fontSize: 14, color: Colors.white)),
+                              ),
+                            ],
+                          ),
+                      ],
 
-                                  onPressed: () => cubit.clearResolvedImage(),
-                                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                                  child: const Text('Delete' , style:
-                                    TextStyle(fontSize: 14 , color: Colors.white)
-                                  ),
-                                ),
-                              ],
-                            ),
-                        ],
                       const SizedBox(height: 20),
+
+                      // Save + Dismiss
                       Row(
                         children: [
                           Expanded(
@@ -299,8 +317,7 @@ class _AdminIssueBottomSheetState extends State<AdminIssueBottomSheet>
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: Colors.black87,
                                 side: BorderSide(color: Colors.grey.shade400),
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 16, horizontal: 12),
+                                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16),
                                 ),
@@ -311,24 +328,22 @@ class _AdminIssueBottomSheetState extends State<AdminIssueBottomSheet>
                           Expanded(
                             child: ElevatedButton.icon(
                               onPressed: () async {
-                                debugPrint('🟢 Save button pressed');
-
-                                if (_selectedStatus == 'resolved' && !hasResolvedImage && cubit.resolvedImageFile == null) {
-                                  debugPrint('⚠️ Missing resolution image');
-                                  // await showDialog( ... );
+                                if (_selectedStatus == 'resolved' &&
+                                    !hasResolvedImage &&
+                                    cubit.resolvedImageFile == null) {
                                   return;
                                 }
 
                                 setState(() => _isSaving = true);
-                                debugPrint('🔄 Saving status: $_selectedStatus');
 
                                 await cubit.updateIssueStatus(
                                   widget.docId,
                                   _selectedStatus,
-                                  adminImage: _selectedStatus == 'resolved' ? cubit.resolvedImageFile : null,
+                                  adminImage: _selectedStatus == 'resolved'
+                                      ? cubit.resolvedImageFile
+                                      : null,
                                 );
                               },
-
                               icon: _isSaving
                                   ? const SizedBox(
                                 width: 20,
@@ -343,8 +358,7 @@ class _AdminIssueBottomSheetState extends State<AdminIssueBottomSheet>
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: theme.primaryColor,
                                 foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 16, horizontal: 12),
+                                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16),
                                 ),
@@ -353,24 +367,30 @@ class _AdminIssueBottomSheetState extends State<AdminIssueBottomSheet>
                           ),
                         ],
                       ),
+
                       const SizedBox(height: 16),
-                      Center(
-                        child: OutlinedButton.icon(
-                          onPressed: () {},
-                          icon: const Icon(Icons.directions_outlined, size: 20),
-                          label: const Text('Get Directions'),
-                          style: OutlinedButton.styleFrom(
-                            minimumSize: const Size(double.infinity, 48),
-                            foregroundColor: Colors.black87,
-                            side: BorderSide(color: Colors.grey.shade400),
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 16, horizontal: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
+
+                      // Get Directions
+                      if (!_isSaving)
+                        Center(
+                          child: OutlinedButton.icon(
+                            onPressed: (){
+                              debugPrint('📍 Get Directions Tapped');
+                              widget.onGetDirections();
+                            },
+                            icon: const Icon(Icons.directions_outlined, size: 20),
+                            label: const Text('Get Directions'),
+                            style: OutlinedButton.styleFrom(
+                              minimumSize: const Size(double.infinity, 48),
+                              foregroundColor: Colors.black87,
+                              side: BorderSide(color: Colors.grey.shade400),
+                              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
                             ),
                           ),
                         ),
-                      ),
                     ],
                   ),
                 ),
