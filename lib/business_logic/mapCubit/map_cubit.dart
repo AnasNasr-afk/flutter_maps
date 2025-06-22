@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_maps/business_logic/mapCubit/map_states.dart';
 import 'package:flutter_maps/data/repository/maps_repo.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -11,15 +12,17 @@ import 'package:material_floating_search_bar_2/material_floating_search_bar_2.da
 
 import '../../data/models/place_suggestion_model.dart';
 import '../../helpers/admin_services.dart';
+import '../../helpers/location_helper.dart';
 import '../../presentation/widgets/admin_issue_bottom_sheet.dart';
 import '../../presentation/widgets/app_markers.dart';
 import '../issueCubit/issue_cubit.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 
 class MapCubit extends Cubit<MapStates> {
   final MapsRepo mapsRepo;
 
-
   MapCubit(this.mapsRepo) : super(MapInitialState()) {
+    debugPrint('[MapCubit] 🔄 Constructor called, initializing...');
     loadMarkersFromFirebase();
     checkAdmin();
   }
@@ -30,10 +33,12 @@ class MapCubit extends Cubit<MapStates> {
   final Set<Marker> _searchMarkers = {};
 
   Set<Marker> get allMarkers => {..._issueMarkers, ..._searchMarkers};
-  FloatingSearchBarController searchBarController = FloatingSearchBarController();
+  FloatingSearchBarController searchBarController =
+      FloatingSearchBarController();
   bool isAdmin = false;
 
   void emitPlacesSuggestion(String places, String sessionToken) {
+    debugPrint('[MapCubit] 🔍 emitPlacesSuggestion() with query: $places');
     mapsRepo.getSuggestions(places, sessionToken).then((placeSuggestions) {
       emit(MapPlacesLoadedState(placeSuggestionModel: placeSuggestions));
     }).catchError((error) {
@@ -44,6 +49,7 @@ class MapCubit extends Cubit<MapStates> {
 
   void emitPlaceDetails(String placesId, String sessionToken,
       PlaceSuggestionModel placeSuggestionModel) {
+    debugPrint('🔍 Fetching details for place ID: $placesId');
     mapsRepo.getLocationDetails(placesId, sessionToken).then((placeDetails) {
       emit(MapDetailsLoadedState(
           placeDetails, placeSuggestionModel)); // ✅ Pass both correctly
@@ -53,13 +59,15 @@ class MapCubit extends Cubit<MapStates> {
     });
   }
 
-  void selectPlace(String placeId, String description,
-      String sessionToken) async {
+  void selectPlace(
+      String placeId, String description, String sessionToken) async {
+    debugPrint('[MapCubit] 📌 selectPlace() for $description');
+    debugPrint('🔍 Selecting place: $placeId, Description: $description');
     emit(MapPlaceSelectingState());
 
     try {
-      final placeDetails = await mapsRepo.getLocationDetails(
-          placeId, sessionToken);
+      final placeDetails =
+          await mapsRepo.getLocationDetails(placeId, sessionToken);
       final latLng = LatLng(
         placeDetails.result.geometry.location.lat,
         placeDetails.result.geometry.location.lng,
@@ -72,14 +80,12 @@ class MapCubit extends Cubit<MapStates> {
     }
   }
 
-
   void setMarkers(Set<Marker> newMarkers) {
     _issueMarkers
       ..clear()
       ..addAll(newMarkers);
     emit(MapMarkerState(markers: allMarkers));
   }
-
 
   void addSearchMarker(Marker marker) {
     _searchMarkers
@@ -99,12 +105,12 @@ class MapCubit extends Cubit<MapStates> {
     _mapContext = context;
   }
 
-
   Future<void> loadMarkersFromFirebase() async {
     debugPrint('[MapCubit] 🔄 Fetching markers from Firebase...');
 
     try {
-      final snapshot = await FirebaseFirestore.instance.collection('issues').get();
+      final snapshot =
+          await FirebaseFirestore.instance.collection('issues').get();
       final Set<Marker> fetchedMarkers = {};
 
       for (var doc in snapshot.docs) {
@@ -131,7 +137,8 @@ class MapCubit extends Cubit<MapStates> {
           longitude: lng,
           category: category,
           description: description,
-          status: status, // ✅ Used here
+          status: status,
+          // ✅ Used here
           onTap: () {
             if (isAdmin) {
               debugPrint('[MapCubit] Admin tapped marker: $description');
@@ -160,11 +167,22 @@ class MapCubit extends Cubit<MapStates> {
                           imagePath: data['image'] ?? '',
                           name: data['userName'] ?? 'Unknown',
                           email: data['userEmail'] ?? 'Unknown',
-                          status: status, // ✅ Used here
+                          status: status,
                           docId: doc.id,
                           adminResolvedImage: data['adminResolvedImage'] ?? '',
                           onGetDirections: () {
-
+                            Navigator.pop(_mapContext);
+                            final latLng = LocationHelper.extractLatLngFromString(data['location']);
+                            if (latLng != null) {
+                              Future.delayed(const Duration(milliseconds: 300), () {
+                                _mapContext.read<MapCubit>().drawRouteToIssue(
+                                  latLng.latitude,
+                                  latLng.longitude,
+                                );
+                              });
+                            } else {
+                              debugPrint('❌ Invalid location string: ${data['location']}');
+                            }
                           },
                         ),
                       ),
@@ -179,7 +197,6 @@ class MapCubit extends Cubit<MapStates> {
         fetchedMarkers.add(marker);
       }
 
-
       _issueMarkers
         ..clear()
         ..addAll(fetchedMarkers);
@@ -190,8 +207,6 @@ class MapCubit extends Cubit<MapStates> {
       emit(MapErrorState());
     }
   }
-
-
 
   bool isAdminChecked = false;
 
@@ -211,4 +226,48 @@ class MapCubit extends Cubit<MapStates> {
 
 
 
+  Future<void> drawRouteToIssue(double destLat, double destLng) async {
+    debugPrint('🧭 drawRouteToIssue START: $destLat, $destLng');
+
+    final origin = await LocationHelper.getCurrentLocation();
+
+    debugPrint('📍 Origin: ${origin.latitude}, ${origin.longitude}');
+
+    final polylinePoints = PolylinePoints();
+    final result = await polylinePoints.getRouteBetweenCoordinates(
+      googleApiKey: dotenv.env['GOOGLE_API_KEY']!,
+      request: PolylineRequest(
+        origin: PointLatLng(origin.latitude, origin.longitude),
+        destination: PointLatLng(destLat, destLng),
+        mode: TravelMode.driving,
+      ),
+    );
+
+    debugPrint('📈 Fetched ${result.points.length} polyline points');
+
+
+    if (result.points.isEmpty) {
+      debugPrint('❌ No route found');
+      emit(MapRouteErrorState('No route found'));
+      return;
+    }
+
+    final polylineCoordinates = result.points
+        .map((point) => LatLng(point.latitude, point.longitude))
+        .toList();
+
+    final polyline = Polyline(
+      polylineId: const PolylineId('route'),
+      color: Colors.blue,
+      width: 5,
+      points: polylineCoordinates,
+    );
+
+    debugPrint('✅ Emitting MapRouteState with ${polyline.points.length} points');
+
+    emit(MapRouteState(
+      polyline: polyline,
+      cameraTarget: LatLng(destLat, destLng),
+    ));
+  }
 }

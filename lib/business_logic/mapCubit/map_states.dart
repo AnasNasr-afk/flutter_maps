@@ -59,3 +59,17 @@ class MapAdminState extends MapStates {
   final bool isAdmin;
   MapAdminState(this.isAdmin);
 }
+class MapRouteState extends MapStates {
+  final Polyline polyline;
+  final LatLng cameraTarget;
+
+  MapRouteState({
+    required this.polyline,
+    required this.cameraTarget,
+  });
+}
+class MapRouteErrorState extends MapStates {
+  final String errorMessage;
+
+  MapRouteErrorState(this.errorMessage);
+}

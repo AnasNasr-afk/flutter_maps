@@ -53,6 +53,7 @@ class _MapScreenState extends State<MapScreen> {
             .animateCamera(CameraUpdate.newCameraPosition(cameraPosition!));
       }
 
+
       if (mounted) {
         // final marker = AppMarkers.buildCurrentLocationMarker(position!);
         setState(() {});
@@ -71,18 +72,18 @@ class _MapScreenState extends State<MapScreen> {
         children: [
           if (cameraPosition != null)
             BlocBuilder<MapCubit, MapStates>(
-              buildWhen: (previous, current) => current is MapMarkerState,
+              buildWhen: (previous, current) => current is MapMarkerState || current is MapRouteState,
               builder: (context, state) {
-
-   // TODO if user is an admin on doubleTap on marker : direction from location to marker is drawn
-
                 return GoogleMap(
                   zoomControlsEnabled: false,
-                  initialCameraPosition: cameraPosition!,
-                  markers: state is MapMarkerState ? state.markers : {
 
-                  },
+                  initialCameraPosition: cameraPosition!,
+                  markers: state is MapMarkerState ? state.markers : {},
+                  polylines: state is MapRouteState ? {state.polyline} : {},
                   onMapCreated: (GoogleMapController controller) {
+                    if (state is MapRouteState) {
+                      controller.animateCamera(CameraUpdate.newLatLng(state.cameraTarget));
+                    }
                     if (!controllerCompleter.isCompleted) {
                       controllerCompleter.complete(controller);
                     }
@@ -137,13 +138,7 @@ class _MapScreenState extends State<MapScreen> {
           const MapSelectedLocationListener(),
         ],
       ),
-      //TODO if user is an admin :
-      // remove the add icon and later switch to analysis icon ,
-      // onTap on marker :
-      // bottom sheet is opened with the data of the issue
-      // {
-      // category,description,
-      // image,name of the user,mail of the user,status of the issue }
+
       floatingActionButton: BlocBuilder<MapCubit, MapStates>(
         builder: (context, state) {
           final cubit = MapCubit.get(context);
@@ -309,7 +304,6 @@ class _MapScreenState extends State<MapScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: ElevatedButton.icon(
                   onPressed: ()  {
-                     //TODO logout refactoring
                     logOut(context);
                   },
                   icon: const Icon(Icons.logout, color: Colors.white),
