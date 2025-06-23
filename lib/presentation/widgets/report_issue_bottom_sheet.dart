@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_maps/business_logic/issueCubit/issue_cubit.dart';
 import 'package:flutter_maps/data/models/user_model.dart';
 import 'package:flutter_maps/presentation/widgets/app_text_form_field.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../business_logic/issueCubit/issue_states.dart';
@@ -73,19 +74,19 @@ class _ReportIssueBottomSheetState extends State<ReportIssueBottomSheet> {
       },
       child: DraggableScrollableSheet(
         expand: false,
-        initialChildSize: 0.75,
-        minChildSize: 0.5,
-        maxChildSize: 0.95,
+        initialChildSize: 0.75.sp,
+        minChildSize: 0.5.sp,
+        maxChildSize: 0.95.sp,
         builder: (context, scrollController) {
           return Container(
-            decoration: const BoxDecoration(
+            decoration:  BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black26,
-                  blurRadius: 12,
-                  offset: Offset(0, -4),
+                  blurRadius: 12.r,
+                  offset: const Offset(0, -4),
                 )
               ],
             ),
@@ -93,18 +94,18 @@ class _ReportIssueBottomSheetState extends State<ReportIssueBottomSheet> {
               key: formKey,
               child: SingleChildScrollView(
                 controller: scrollController,
-                padding: const EdgeInsets.all(20),
+                padding:  EdgeInsets.all(20.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Center(
                       child: Container(
-                        width: 40,
-                        height: 5,
-                        margin: const EdgeInsets.only(bottom: 16),
+                        width: 40.w,
+                        height: 5.h,
+                        margin:  EdgeInsets.only(bottom: 16.h),
                         decoration: BoxDecoration(
                           color: Colors.grey[400],
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(8.r),
                         ),
                       ),
                     ),
@@ -115,40 +116,40 @@ class _ReportIssueBottomSheetState extends State<ReportIssueBottomSheet> {
                             ?.copyWith(fontWeight: FontWeight.bold),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20.h),
                     DropdownButtonFormField<String>(
                       dropdownColor: Colors.white,
                       decoration: InputDecoration(
                         enabledBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(
+                          borderSide:  BorderSide(
                             color: Colors.grey,
-                            width: 1.3,
+                            width: 1.3.w,
                           ),
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(16.r),
                         ),
                         focusedErrorBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(
+                          borderSide:  BorderSide(
                             color: Colors.red,
-                            width: 1.3,
+                            width: 1.3.w,
                           ),
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(16.r),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(
+                          borderSide: BorderSide(
                             color: ColorManager.mainBlue,
-                            width: 1.3,
+                            width: 1.3.w,
                           ),
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(16.r),
                         ),
                         hintText: 'Select Category',
                         labelText: 'Category',
                         labelStyle: TextStyles.font16GreyMedium,
                         border: OutlineInputBorder(
-                          borderSide: const BorderSide(
+                          borderSide: BorderSide(
                             color: Colors.grey,
-                            width: 1.3,
+                            width: 1.3.w,
                           ),
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(16.r),
                         ),
                         filled: true,
                         fillColor: Colors.white,
@@ -172,7 +173,7 @@ class _ReportIssueBottomSheetState extends State<ReportIssueBottomSheet> {
                         return null;
                       },
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16.h),
                     AppTextFormField(
                       controller: descriptionController,
                       hintText: 'Describe the issue',
@@ -186,28 +187,28 @@ class _ReportIssueBottomSheetState extends State<ReportIssueBottomSheet> {
                         return null;
                       },
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16.h),
                     Container(
-                      padding: const EdgeInsets.all(12),
+                      padding: EdgeInsets.all(12.w),
                       decoration: BoxDecoration(
                         color: Colors.blue.shade50,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(12.r),
                       ),
-                      child: const Row(
+                      child: Row(
                         children: [
-                          Icon(Icons.location_on, color: Colors.blue),
-                          SizedBox(width: 10),
+                          const Icon(Icons.location_on, color: Colors.blue),
+                          SizedBox(width: 10.w),
                           Expanded(
                             child: Text(
                               "Using current location automatically",
                               style:
-                                  TextStyle(fontSize: 16, color: Colors.blue),
+                                  TextStyle(fontSize: 16.sp, color: Colors.blue),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16.h),
                     if (cubit.imageFile == null)
                       Center(
                         child: Row(
@@ -233,7 +234,7 @@ class _ReportIssueBottomSheetState extends State<ReportIssueBottomSheet> {
                                 });
                               },
                             ),
-                            const SizedBox(width: 16),
+                            SizedBox(width: 16.w),
                             ElevatedButton.icon(
                               icon: const Icon(
                                 Icons.camera_alt,
@@ -257,7 +258,7 @@ class _ReportIssueBottomSheetState extends State<ReportIssueBottomSheet> {
                           ],
                         ),
                       ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16.h),
                     BlocBuilder<IssueCubit, IssueStates>(
                       builder: (context, state) {
                         final cubit = IssueCubit.get(context);
@@ -273,15 +274,15 @@ class _ReportIssueBottomSheetState extends State<ReportIssueBottomSheet> {
                           return Column(
                             children: [
                               ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(12.r),
                                 child: Image.file(
                                   cubit.imageFile!,
-                                  width: 300,
-                                  height: 300,
+                                  width: 300.w,
+                                  height: 300.h,
                                   fit: BoxFit.cover,
                                 ),
                               ),
-                              const SizedBox(height: 16),
+                              SizedBox(height: 16.h),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -301,7 +302,7 @@ class _ReportIssueBottomSheetState extends State<ReportIssueBottomSheet> {
                                       style: TextStyle(color: Colors.blue),
                                     ),
                                   ),
-                                  const SizedBox(width: 16),
+                                  SizedBox(width: 16.w),
                                   ElevatedButton(
                                     onPressed: () async {
                                       await cubit.cropImage(
@@ -315,7 +316,7 @@ class _ReportIssueBottomSheetState extends State<ReportIssueBottomSheet> {
                                       style: TextStyle(color: Colors.blue),
                                     ),
                                   ),
-                                  const SizedBox(width: 16),
+                                  SizedBox(width: 16.w),
                                   ElevatedButton(
                                     onPressed: () {
                                       setState(() {
@@ -343,7 +344,7 @@ class _ReportIssueBottomSheetState extends State<ReportIssueBottomSheet> {
                         }
                       },
                     ),
-                    const SizedBox(height: 30),
+                    SizedBox(height: 30.h),
                     // Submit Button
                     SizedBox(
                       width: double.infinity,
@@ -404,19 +405,18 @@ class _ReportIssueBottomSheetState extends State<ReportIssueBottomSheet> {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          padding: EdgeInsets.symmetric(vertical: 14.h),
                           backgroundColor: Colors.green,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(12.r),
                           ),
                         ),
-                        child: const Text(
+                        child: Text(
                           "Submit",
-                          style: TextStyle(fontSize: 16, color: Colors.white),
+                          style: TextStyle(fontSize: 16.sp, color: Colors.white),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 10),
                   ],
                 ),
               ),

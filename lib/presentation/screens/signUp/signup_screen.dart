@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_maps/presentation/screens/signUp/signupCubit/signup_cubit.dart';
 import 'package:flutter_maps/presentation/screens/signUp/signupCubit/signup_states.dart';
 import 'package:flutter_maps/presentation/widgets/app_text_form_field.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../helpers/app_regex.dart';
 import '../../../helpers/text_styles.dart';
@@ -48,23 +49,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
             child: SafeArea(
               child: Center(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
+                  padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 48.h),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Create Account',
                         style: TextStyle(
-                          fontSize: 32,
+                          fontSize: 32.sp,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12.h),
                       Text(
                         'Please fill in the details to sign up.',
                         style: TextStyles.font14GreyRegular,
                       ),
-                      const SizedBox(height: 32),
+                      SizedBox(height: 32.h),
                       AppTextFormField(
                         controller: cubit.nameController,
                         hintText: 'Full Name',
@@ -75,7 +76,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           return null;
                         },
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20.h),
                       AppTextFormField(
                         controller: cubit.emailController,
                         hintText: 'Email Address',
@@ -86,7 +87,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           return null;
                         },
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20.h),
                       AppTextFormField(
                         maxLines: 1,
                         hintText: 'Password',
@@ -116,7 +117,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           }
                         },
                       ),
-                      const SizedBox(height: 32),
+                      SizedBox(height: 32.h),
                       isLoading
                           ? const Center(child: CircularProgressIndicator(color: Colors.blue))
                           : AppTextButton(
@@ -125,21 +126,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             cubit.userSignup();
                           }
                         },
-                        buttonStyle: const ButtonStyle(
-                          backgroundColor: WidgetStatePropertyAll(Colors.blue),
+                        buttonStyle: ButtonStyle(
+                          backgroundColor: const WidgetStatePropertyAll(Colors.blue),
                           shape: WidgetStatePropertyAll(
                             RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(12)),
+                              borderRadius: BorderRadius.all(Radius.circular(12.r)),
                             ),
                           ),
-                          minimumSize: WidgetStatePropertyAll(Size(double.infinity, 50)),
+                          minimumSize: WidgetStatePropertyAll(Size(double.infinity.w, 50.h)),
                         ),
-                        text: const Text(
+                        text: Text(
                           'Sign Up',
-                          style: TextStyle(color: Colors.white, fontSize: 18),
+                          style: TextStyle(color: Colors.white, fontSize: 18.sp),
                         ),
                       ),
-                      const SizedBox(height: 32),
+                      SizedBox(height: 32.h),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [

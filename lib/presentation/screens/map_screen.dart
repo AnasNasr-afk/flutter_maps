@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:uuid/uuid.dart';
-
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../business_logic/mapCubit/map_cubit.dart';
 import '../../business_logic/mapCubit/map_states.dart';
 import '../../helpers/components.dart';
@@ -49,15 +49,10 @@ class _MapScreenState extends State<MapScreen> {
 
       if (controllerCompleter.isCompleted) {
         final controller = await controllerCompleter.future;
-        controller
-            .animateCamera(CameraUpdate.newCameraPosition(cameraPosition!));
+        controller.animateCamera(CameraUpdate.newCameraPosition(cameraPosition!));
       }
 
-
-      if (mounted) {
-        // final marker = AppMarkers.buildCurrentLocationMarker(position!);
-        setState(() {});
-      }
+      if (mounted) setState(() {});
     } catch (e) {
       debugPrint('❌ Error getting location: $e');
     }
@@ -66,83 +61,107 @@ class _MapScreenState extends State<MapScreen> {
   @override
   Widget build(BuildContext context) {
     final cubit = MapCubit.get(context);
-    cubit.setContext(context); // 🧠 this is the fix
+    cubit.setContext(context);
+
     return Scaffold(
       body: Stack(
         children: [
           if (cameraPosition != null)
             BlocBuilder<MapCubit, MapStates>(
-              buildWhen: (previous, current) => current is MapMarkerState || current is MapRouteState,
+              buildWhen: (previous, current) =>
+              current is MapMarkerState || current is MapRouteState,
               builder: (context, state) {
                 return GoogleMap(
                   zoomControlsEnabled: false,
-
+                  myLocationEnabled: true,
+                  myLocationButtonEnabled: false,
                   initialCameraPosition: cameraPosition!,
                   markers: state is MapMarkerState ? state.markers : {},
                   polylines: state is MapRouteState ? {state.polyline} : {},
-                  onMapCreated: (GoogleMapController controller) {
+                  onMapCreated: (controller) {
                     if (state is MapRouteState) {
-                      controller.animateCamera(CameraUpdate.newLatLng(state.cameraTarget));
+                      controller.animateCamera(
+                          CameraUpdate.newLatLng(state.cameraTarget));
                     }
                     if (!controllerCompleter.isCompleted) {
                       controllerCompleter.complete(controller);
                     }
-                    MapCubit.get(context).mapController.complete(controller);
+                    cubit.mapController.complete(controller);
                   },
-                  myLocationEnabled: true,
-                  myLocationButtonEnabled: true,
-                  padding: const EdgeInsets.only(bottom: 130, right: 5),
+                  padding: EdgeInsets.only(bottom: 130.h, right: 5.w),
                 );
               },
             ),
-          MapSearchBar(onSuggestionSelected: (marker) {
-            setState(() {
-              MapCubit.get(context).addSearchMarker(marker);
-            });
-          }),
+
+          /// Search Bar
+          MapSearchBar(
+            onSuggestionSelected: (marker) {
+              setState(() => cubit.addSearchMarker(marker));
+            },
+          ),
+
+          /// Legend FAB and Window
           Positioned(
-            top: 120,
-            right: 10,
+            top: 120.h,
+            right: 10.w,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisSize: MainAxisSize.min,
               children: [
                 FloatingActionButton.small(
                   heroTag: 'legend_fab',
                   backgroundColor: Colors.white,
                   onPressed: () {
-                    setState(() {
-                      _isLegendVisible = !_isLegendVisible;
-                    });
+                    setState(() => _isLegendVisible = !_isLegendVisible);
                   },
                   child: Icon(
                     _isLegendVisible ? Icons.close : Icons.info_outline,
                     color: Colors.black,
                   ),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8.h),
                 if (_isLegendVisible)
                   Material(
-                    elevation: 4,
-                    borderRadius: BorderRadius.circular(12),
+                    elevation: 4.h,
+                    borderRadius: BorderRadius.circular(12.r),
                     child: ConstrainedBox(
-                      constraints: const BoxConstraints(
-                        maxWidth: 200,
-                      ),
+                      constraints: BoxConstraints(maxWidth: 200.w),
                       child: const MapLegendWindow(),
                     ),
                   ),
               ],
             ),
           ),
+
+          /// Custom My Location Button (bottom right)
+          Positioned(
+            bottom: 120.h,
+            right: 15.w,
+            child: FloatingActionButton.small(
+
+              heroTag: 'my_location_fab',
+              backgroundColor: Colors.white,
+              onPressed: () async {
+                final currentPosition = await LocationHelper.getCurrentLocation();
+                final controller = await controllerCompleter.future;
+                controller.animateCamera(
+                  CameraUpdate.newLatLng(
+                    LatLng(currentPosition.latitude, currentPosition.longitude),
+                  ),
+                );
+              },
+              child:  Icon(Icons.my_location,
+                  size: 24.sp,
+                  color: Colors.black),
+            ),
+          ),
+
           const MapSelectedLocationListener(),
         ],
       ),
 
+      /// FAB
       floatingActionButton: BlocBuilder<MapCubit, MapStates>(
         builder: (context, state) {
-          final cubit = MapCubit.get(context);
-
           if (!cubit.isAdminChecked) {
             return FloatingActionButton(
               onPressed: () {},
@@ -152,50 +171,39 @@ class _MapScreenState extends State<MapScreen> {
                 tween: Tween(begin: 0.0, end: 24.0),
                 duration: const Duration(milliseconds: 600),
                 curve: Curves.easeInOut,
-                builder: (context, size, child) {
-                  return SizedBox(
-                    height: size,
-                    width: size,
-                    child: const CircularProgressIndicator(
-                      strokeWidth: 2.5,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
-                    ),
-                  );
-                },
+                builder: (_, size, __) => SizedBox(
+                  height: size,
+                  width: size,
+                  child: const CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                  ),
+                ),
               ),
             );
           }
 
-          if (cubit.isAdmin) {
-            return FloatingActionButton(
-              backgroundColor: Colors.amber,
-              onPressed: () {
+          return FloatingActionButton(
+            heroTag: null,
+            backgroundColor: Colors.amber,
+            onPressed: () {
+              if (cubit.isAdmin) {
                 // admin logic
-              },
-              child: const Icon(
-                Icons.analytics_outlined,
-                color: Colors.black,
-                size: 30,
-              ),
-            );
-          } else {
-            return FloatingActionButton(
-              heroTag: null,
-              onPressed: () {
+              } else {
                 showReportBottomSheet(context);
-              },
-              backgroundColor: Colors.amber,
-              child: const Icon(
-                Icons.add,
-                size: 30,
-                color: Colors.black,
-              ),
-            );
-          }
+              }
+            },
+            child: Icon(
+              cubit.isAdmin ? Icons.analytics_outlined : Icons.add,
+              color: Colors.black,
+              size: 30.sp,
+            ),
+          );
         },
       ),
-
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+
+      /// Drawer
       drawer: Drawer(
         backgroundColor: Colors.white,
         child: SafeArea(
@@ -203,9 +211,9 @@ class _MapScreenState extends State<MapScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Container(
-                padding: const EdgeInsets.all(16),
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
+                padding: EdgeInsets.all(16.w),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
                     colors: [Colors.amber, Colors.orange],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -213,13 +221,13 @@ class _MapScreenState extends State<MapScreen> {
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black26,
-                      blurRadius: 8,
-                      offset: Offset(0, 3),
+                      blurRadius: 8.r,
+                      offset: Offset(0, 3.h),
                     ),
                   ],
                   borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(20),
-                    bottomRight: Radius.circular(20),
+                    bottomLeft: Radius.circular(20.r),
+                    bottomRight: Radius.circular(20.r),
                   ),
                 ),
                 child: Column(
@@ -227,23 +235,23 @@ class _MapScreenState extends State<MapScreen> {
                   children: [
                     Text(
                       FirebaseAuth.instance.currentUser?.displayName ?? 'User',
-                      style: const TextStyle(
-                        fontSize: 20,
+                      style: TextStyle(
+                        fontSize: 20.sp,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
                       ),
                     ),
                     Text(
                       FirebaseAuth.instance.currentUser?.email ?? 'No email found',
-                      style: const TextStyle(
-                        fontSize: 14,
+                      style: TextStyle(
+                        fontSize: 14.sp,
                         color: Colors.black54,
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
               BuildDrawerItem(
                 icon: Icons.report_problem_outlined,
                 title: 'Reported Issues',
@@ -263,16 +271,11 @@ class _MapScreenState extends State<MapScreen> {
                 title: 'Change Language',
                 onTap: () {},
               ),
-
-              const SizedBox(height: 10),
-
-              // 🛠 Support & Account
+              SizedBox(height: 10.h),
               BuildDrawerItem(
                 icon: Icons.support_agent,
                 title: 'Call Support',
-                onTap: () {
-                  callSupport(context);
-                },
+                onTap: () => callSupport(context),
               ),
               BuildDrawerItem(
                 icon: Icons.lock_outline,
@@ -284,38 +287,31 @@ class _MapScreenState extends State<MapScreen> {
                 title: 'Delete Account',
                 onTap: () {},
               ),
-
-              const SizedBox(height: 10),
-
-              // ℹ️ Info
+              SizedBox(height: 10.h),
               BuildDrawerItem(
                 icon: Icons.info_outline,
                 title: 'About App',
-                onTap: () {
-                  showModernAboutDialog(context);
-                },
+                onTap: () => showModernAboutDialog(context),
               ),
-
               const Spacer(),
               const Divider(),
-
-              // 🚪 Logout
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
                 child: ElevatedButton.icon(
-                  onPressed: ()  {
-                    logOut(context);
-                  },
-                  icon: const Icon(Icons.logout, color: Colors.white),
-                  label: const Text('Logout'),
+                  onPressed: () => logOut(context),
+                  icon: Icon(Icons.logout, color: Colors.white, size: 20.sp),
+                  label: Text(
+                    'Logout',
+                    style: TextStyle(fontSize: 16.sp),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.redAccent,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    padding: EdgeInsets.symmetric(vertical: 14.h),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(12.r),
                     ),
-                    elevation: 4,
+                    elevation: 4.h,
                   ),
                 ),
               ),
@@ -325,6 +321,4 @@ class _MapScreenState extends State<MapScreen> {
       ),
     );
   }
-
-
 }

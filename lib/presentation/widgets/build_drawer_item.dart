@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class BuildDrawerItem extends StatelessWidget {
   final IconData icon;
@@ -18,8 +19,8 @@ class BuildDrawerItem extends StatelessWidget {
       leading: Icon(icon, color: Colors.black87),
       title: Text(
         title,
-        style: const TextStyle(
-          fontSize: 16,
+        style: TextStyle(
+          fontSize: 16.sp,
           fontWeight: FontWeight.w500,
         ),
       ),

@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_maps/business_logic/issueCubit/issue_cubit.dart';
 import '../../business_logic/issueCubit/issue_states.dart';
@@ -113,25 +114,24 @@ class _AdminIssueBottomSheetState extends State<AdminIssueBottomSheet>
           minChildSize: 0.3,
           maxChildSize: 0.95,
           builder: (context, scrollController) => ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.white.withAlpha(220),
                   borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(24)),
+                  BorderRadius.vertical(top: Radius.circular(24.r)),
                   border: Border.all(color: Colors.white.withAlpha(50)),
                 ),
                 child: SingleChildScrollView(
                   controller: scrollController,
-                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 40),
+                  padding:  EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 40.h),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       buildHandle(),
 
-                      // Category
                       buildSection(
                         context,
                         title: 'Category',
@@ -143,7 +143,7 @@ class _AdminIssueBottomSheetState extends State<AdminIssueBottomSheet>
                               : widget.category[0].toUpperCase() +
                               widget.category.substring(1),
                           style: theme.textTheme.bodyLarge?.copyWith(
-                            height: 1.6,
+                            height: 1.6.h,
                             color: Colors.black87.withAlpha(230),
                           ),
                         ),
@@ -159,7 +159,7 @@ class _AdminIssueBottomSheetState extends State<AdminIssueBottomSheet>
                               ? 'No description provided'
                               : widget.description,
                           style: theme.textTheme.bodyLarge?.copyWith(
-                            height: 1.6,
+                            height: 1.6.h,
                             color: Colors.black87.withAlpha(230),
                           ),
                         ),
@@ -184,7 +184,7 @@ class _AdminIssueBottomSheetState extends State<AdminIssueBottomSheet>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text('Name: ${widget.name.isEmpty ? 'Unknown' : widget.name}'),
-                            const SizedBox(height: 4),
+                            SizedBox(height: 4.h),
                             Text('Email: ${widget.email.isEmpty ? 'Unknown' : widget.email}'),
                           ],
                         ),
@@ -204,8 +204,8 @@ class _AdminIssueBottomSheetState extends State<AdminIssueBottomSheet>
                         title: 'Change Status',
                         animation: _fadeAnimation,
                         child: Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
+                          spacing: 8.h,
+                          runSpacing: 8.h,
                           children: _statusOptions.map((status) {
                             final isSelected = status == _selectedStatus;
                             return ChoiceChip(
@@ -222,7 +222,7 @@ class _AdminIssueBottomSheetState extends State<AdminIssueBottomSheet>
                               selectedColor: getStatusColor(status),
                               backgroundColor: Colors.grey.shade100,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(20.r),
                                 side: BorderSide(color: getStatusColor(status).withAlpha(80)),
                               ),
                               onSelected: _isSaving
@@ -240,26 +240,26 @@ class _AdminIssueBottomSheetState extends State<AdminIssueBottomSheet>
 
                       // If resolved, show image section
                       if (_selectedStatus == 'resolved') ...[
-                        const SizedBox(height: 16),
+                        SizedBox(height: 16.h),
                         buildSection(
                           context,
                           title: 'Resolution Image',
                           icon: Icons.image_outlined,
                           animation: _fadeAnimation,
                           child: ClipRRect(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(16.r),
                             child: cubit.resolvedImageFile != null
                                 ? Image.file(
                               cubit.resolvedImageFile!,
-                              height: 220,
-                              width: double.infinity,
+                              height: 220.h,
+                              width: double.infinity.w,
                               fit: BoxFit.cover,
                             )
                                 : hasResolvedImage
                                 ? Image.memory(
                               resolvedImageBytes!,
-                              height: 220,
-                              width: double.infinity,
+                              height: 220.h,
+                              width: double.infinity.w,
                               fit: BoxFit.cover,
                             )
                                 : buildErrorImage(),
@@ -267,15 +267,15 @@ class _AdminIssueBottomSheetState extends State<AdminIssueBottomSheet>
                         ),
                         if (cubit.resolvedImageFile == null && !hasResolvedImage)
                           Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            padding: EdgeInsets.symmetric(vertical: 12.h),
                             child: ElevatedButton.icon(
                               onPressed: () {
                                 cubit.pickResolvedImage(ImageSource.gallery);
                               },
                               icon: const Icon(Icons.upload, color: Colors.white),
-                              label: const Text(
+                              label: Text(
                                 'Upload Resolution Image',
-                                style: TextStyle(fontSize: 16, color: Colors.white),
+                                style: TextStyle(fontSize: 16.sp, color: Colors.white),
                               ),
                               style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
                             ),
@@ -287,24 +287,24 @@ class _AdminIssueBottomSheetState extends State<AdminIssueBottomSheet>
                               ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
+                                    borderRadius: BorderRadius.circular(16.r),
                                   ),
                                   backgroundColor: Colors.grey.shade300,
                                 ),
                                 onPressed: () => cubit.pickResolvedImage(ImageSource.gallery),
-                                child: const Text('Reselect Image', style: TextStyle(fontSize: 14)),
+                                child: Text('Reselect Image', style: TextStyle(fontSize: 14.sp)),
                               ),
-                              const SizedBox(width: 12),
+                              SizedBox(width: 12.w),
                               ElevatedButton(
                                 onPressed: () => cubit.clearResolvedImage(),
                                 style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                                child: const Text('Delete', style: TextStyle(fontSize: 14, color: Colors.white)),
+                                child: Text('Delete', style: TextStyle(fontSize: 14.sp, color: Colors.white)),
                               ),
                             ],
                           ),
                       ],
 
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20.h),
 
                       // Save + Dismiss
                       Row(
@@ -312,19 +312,19 @@ class _AdminIssueBottomSheetState extends State<AdminIssueBottomSheet>
                           Expanded(
                             child: OutlinedButton.icon(
                               onPressed: () => Navigator.pop(context),
-                              icon: const Icon(Icons.cancel_outlined, size: 20),
+                              icon: Icon(Icons.cancel_outlined, size: 20.w),
                               label: const Text('Dismiss'),
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: Colors.black87,
                                 side: BorderSide(color: Colors.grey.shade400),
-                                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                                padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 12.w),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
+                                  borderRadius: BorderRadius.circular(16.r),
                                 ),
                               ),
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          SizedBox(width: 12.w),
                           Expanded(
                             child: ElevatedButton.icon(
                               onPressed: () async {
@@ -345,22 +345,22 @@ class _AdminIssueBottomSheetState extends State<AdminIssueBottomSheet>
                                 );
                               },
                               icon: _isSaving
-                                  ? const SizedBox(
-                                width: 20,
-                                height: 20,
+                                  ? SizedBox(
+                                width: 20.w,
+                                height: 20.h,
                                 child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation(Colors.white),
+                                  strokeWidth: 2.w,
+                                  valueColor: const AlwaysStoppedAnimation(Colors.white),
                                 ),
                               )
-                                  : const Icon(Icons.save_outlined, size: 20),
+                                  : Icon(Icons.save_outlined, size: 20.w),
                               label: const Text('Save Status'),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: theme.primaryColor,
                                 foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                                padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 12.w),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
+                                  borderRadius: BorderRadius.circular(16.r),
                                 ),
                               ),
                             ),
@@ -368,7 +368,7 @@ class _AdminIssueBottomSheetState extends State<AdminIssueBottomSheet>
                         ],
                       ),
 
-                      const SizedBox(height: 16),
+                      SizedBox(height: 16.h),
 
                       // Get Directions
                       if (!_isSaving)
@@ -378,15 +378,15 @@ class _AdminIssueBottomSheetState extends State<AdminIssueBottomSheet>
                               debugPrint('📍 Get Directions Tapped');
                               widget.onGetDirections();
                             },
-                            icon: const Icon(Icons.directions_outlined, size: 20),
+                            icon: Icon(Icons.directions_outlined, size: 20.w),
                             label: const Text('Get Directions'),
                             style: OutlinedButton.styleFrom(
-                              minimumSize: const Size(double.infinity, 48),
+                              minimumSize: Size(double.infinity.w, 48.h),
                               foregroundColor: Colors.black87,
                               side: BorderSide(color: Colors.grey.shade400),
-                              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                              padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 12.w),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
+                                borderRadius: BorderRadius.circular(16.r),
                               ),
                             ),
                           ),

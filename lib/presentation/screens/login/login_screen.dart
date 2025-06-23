@@ -4,6 +4,7 @@ import 'package:flutter_maps/presentation/screens/login/loginCubit/login_cubit.d
 import 'package:flutter_maps/presentation/screens/login/loginCubit/login_states.dart';
 import 'package:flutter_maps/presentation/widgets/app_text_button.dart';
 import 'package:flutter_maps/presentation/widgets/app_text_form_field.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../helpers/app_regex.dart';
 import '../../../helpers/text_styles.dart';
@@ -29,21 +30,21 @@ class _LoginScreenState extends State<LoginScreen> {
           key: cubit.formKey,
           child: Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 32),
+              padding: EdgeInsets.symmetric(horizontal: 32.w),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Welcome Back',
-                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 32.sp, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12.h),
                   Text(
                     'Please login to continue',
                     style: TextStyles.font14GreyRegular,
                   ),
-                  const SizedBox(height: 32),
+                  SizedBox(height: 32.h),
                   AppTextFormField(
                     controller: cubit.emailController,
                     keyboardType: TextInputType.emailAddress,
@@ -55,7 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20.h),
                   AppTextFormField(
                     maxLines: 1,
                     hintText: 'Enter your password',
@@ -85,7 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       }
                     },
                   ),
-                  const SizedBox(height: 32),
+                  SizedBox(height: 32.h),
                   BlocConsumer<LoginCubit, LoginStates>(
                     listener: (context, state) {
                       if (state is LoginLoadingState) {
@@ -120,23 +121,23 @@ class _LoginScreenState extends State<LoginScreen> {
                             cubit.userLogin(context);
                           }
                         },
-                        buttonStyle: const ButtonStyle(
-                          backgroundColor: WidgetStatePropertyAll(Colors.blue),
+                        buttonStyle: ButtonStyle(
+                          backgroundColor: const WidgetStatePropertyAll(Colors.blue),
                           shape: WidgetStatePropertyAll(
                             RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(12)),
+                              borderRadius: BorderRadius.all(Radius.circular(12.r)),
                             ),
                           ),
-                          minimumSize: WidgetStatePropertyAll(Size(double.infinity, 50)),
+                          minimumSize: WidgetStatePropertyAll(Size(double.infinity.w, 50.h)),
                         ),
-                        text: const Text(
+                        text: Text(
                           'Login',
-                          style: TextStyle(color: Colors.white, fontSize: 18),
+                          style: TextStyle(color: Colors.white, fontSize: 18.sp),
                         ),
                       );
                     },
                   ),
-                  const SizedBox(height: 32),
+                  SizedBox(height: 32.h),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

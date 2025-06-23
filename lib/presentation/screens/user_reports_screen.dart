@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../business_logic/userReportsCubit/user_reports_cubit.dart';
 import '../../business_logic/userReportsCubit/user_reports_states.dart';
 import '../../data/models/issue_model.dart';
@@ -34,17 +35,17 @@ class _UserReportsScreenState extends State<UserReportsScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(70),
+        preferredSize: Size.fromHeight(70.h),
         child: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
               colors: [Colors.amber, Colors.orange],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(20),
-              bottomRight: Radius.circular(20),
+              bottomLeft: Radius.circular(20.r),
+              bottomRight: Radius.circular(20.r),
             ),
           ),
           child: AppBar(
@@ -61,7 +62,9 @@ class _UserReportsScreenState extends State<UserReportsScreen> {
       body: RefreshIndicator(
         onRefresh: () async {
           if (userId != null) {
-            await context.read<UserReportsCubit>().loadUserReportedIssues(userId);
+            await context
+                .read<UserReportsCubit>()
+                .loadUserReportedIssues(userId);
           }
         },
         child: BlocBuilder<UserReportsCubit, UserReportsStates>(
@@ -74,26 +77,25 @@ class _UserReportsScreenState extends State<UserReportsScreen> {
               }
 
               return Padding(
-                padding: const EdgeInsets.all(12),
+                padding: EdgeInsets.all(12.w),
                 child: ListView.separated(
                   itemCount: issues.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  separatorBuilder: (_, __) => SizedBox(height: 12.h),
                   itemBuilder: (context, index) {
                     final issue = issues[index];
                     final status = issue['status'] ?? 'pending';
 
                     return Card(
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18),
+                        borderRadius: BorderRadius.circular(18.r),
                       ),
                       elevation: 4,
                       color: Colors.white,
                       child: Padding(
-                        padding: const EdgeInsets.all(16),
+                        padding: EdgeInsets.all(16.r),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            /// Header
                             Row(
                               children: [
                                 buildSectionHeader('Category'),
@@ -101,43 +103,51 @@ class _UserReportsScreenState extends State<UserReportsScreen> {
                                 buildStatusPill(status),
                               ],
                             ),
-                            const SizedBox(height: 6),
+                            SizedBox(height: 6.h),
                             Text(
                               issue['category'] ?? 'Unknown',
-                              style: const TextStyle(fontSize: 15),
+                              style: TextStyle(fontSize: 15.sp),
                             ),
 
                             /// Description
-                            const SizedBox(height: 16),
+                            SizedBox(height: 16.h),
                             buildSectionHeader('Description'),
-                            const SizedBox(height: 6),
+                            SizedBox(height: 6.h),
                             Text(
-                              (issue['description']?.toString().trim().isNotEmpty ?? false)
+                              (issue['description']
+                                          ?.toString()
+                                          .trim()
+                                          .isNotEmpty ??
+                                      false)
                                   ? issue['description']
                                   : 'No description provided.',
-                              style: const TextStyle(fontSize: 14, height: 1.4),
+                              style: TextStyle(fontSize: 14.sp, height: 1.4.h),
                             ),
 
                             /// Attached Image
-                            const SizedBox(height: 16),
+                            SizedBox(height: 16.h),
                             buildSectionHeader('Attached Image'),
-                            const SizedBox(height: 6),
-                            buildIssueImage(context, issue['image']?.toString()),
+                            SizedBox(height: 6.h),
+                            buildIssueImage(
+                                context, issue['image']?.toString()),
 
                             /// Admin Resolved Image
                             if (issue['adminResolvedImage'] != null) ...[
-                              const SizedBox(height: 16),
+                              SizedBox(height: 16.h),
                               buildSectionHeader('Resolved Image'),
-                              const SizedBox(height: 6),
-                              buildIssueImage(context, issue['adminResolvedImage']?.toString()),
+                              SizedBox(height: 6.h),
+                              buildIssueImage(context,
+                                  issue['adminResolvedImage']?.toString()),
                             ],
 
                             /// User Info
-                            const SizedBox(height: 16),
+                            SizedBox(height: 16.h),
                             buildSectionHeader('Submitted By'),
-                            const SizedBox(height: 6),
-                            Text('Name: ${issue['userName']?.toString().isNotEmpty == true ? issue['userName'] : 'Unknown'}'),
-                            Text('Email: ${issue['userEmail']?.toString().isNotEmpty == true ? issue['userEmail'] : 'Unknown'}'),
+                            SizedBox(height: 6.h),
+                            Text(
+                                'Name: ${issue['userName']?.toString().isNotEmpty == true ? issue['userName'] : 'Unknown'}'),
+                            Text(
+                                'Email: ${issue['userEmail']?.toString().isNotEmpty == true ? issue['userEmail'] : 'Unknown'}'),
                           ],
                         ),
                       ),
@@ -159,8 +169,8 @@ class _UserReportsScreenState extends State<UserReportsScreen> {
   Widget buildSectionHeader(String title) {
     return Text(
       title,
-      style: const TextStyle(
-        fontSize: 15,
+      style: TextStyle(
+        fontSize: 15.sp,
         fontWeight: FontWeight.w600,
         color: Colors.black87,
       ),
@@ -169,14 +179,14 @@ class _UserReportsScreenState extends State<UserReportsScreen> {
 
   Widget buildStatusPill(String status) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
       decoration: BoxDecoration(
         color: getStatusColor(status),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
       ),
       child: Text(
         IssueStatusExtension.fromString(status).label,
-        style: const TextStyle(color: Colors.white, fontSize: 12),
+        style: TextStyle(color: Colors.white, fontSize: 12.sp),
       ),
     );
   }
@@ -199,8 +209,8 @@ class _UserReportsScreenState extends State<UserReportsScreen> {
       final bytes = base64Decode(image);
       imageWidget = Image.memory(
         bytes,
-        height: 200,
-        width: double.infinity,
+        height: 200.h,
+        width: double.infinity.w,
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) => const Text(
           'Failed to load image',
@@ -210,8 +220,8 @@ class _UserReportsScreenState extends State<UserReportsScreen> {
     } catch (e) {
       imageWidget = Image.network(
         image,
-        height: 200,
-        width: double.infinity,
+        height: 200.h,
+        width: double.infinity.w,
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) => const Text(
           'Failed to load image',
@@ -226,16 +236,16 @@ class _UserReportsScreenState extends State<UserReportsScreen> {
           context: context,
           builder: (_) => Dialog(
             backgroundColor: Colors.transparent,
-            insetPadding: const EdgeInsets.all(12),
+            insetPadding: EdgeInsets.all(12.w),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(6.r),
               child: imageWidget,
             ),
           ),
         );
       },
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
         child: imageWidget,
       ),
     );

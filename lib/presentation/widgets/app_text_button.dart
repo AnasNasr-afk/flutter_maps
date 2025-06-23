@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AppTextButton extends StatelessWidget {
   final void Function() onPressed;
@@ -18,11 +19,11 @@ class AppTextButton extends StatelessWidget {
       style: buttonStyle ??
           ButtonStyle(
             backgroundColor: const WidgetStatePropertyAll(Colors.black),
-            minimumSize: const WidgetStatePropertyAll(
-              Size(80, 50),
+            minimumSize:  WidgetStatePropertyAll(
+              Size(80.w, 50.h),
             ),
             shape: WidgetStatePropertyAll(
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r))),
           ),
       child: text ,
 

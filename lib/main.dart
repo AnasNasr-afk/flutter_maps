@@ -5,6 +5,7 @@ import 'package:flutter_maps/helpers/app_strings.dart';
 import 'package:flutter_maps/helpers/shared_pref_helper.dart';
 import 'package:flutter_maps/router/app_router.dart';
 import 'package:flutter_maps/router/routes.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,11 +34,15 @@ class MapsApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    return MaterialApp(
-      title: 'Flutter Maps',
-      debugShowCheckedModeBanner: false,
-      initialRoute: isLoggedIn ? Routes.mapScreen : Routes.loginScreen,
-      onGenerateRoute: appRouter.generateRoutes,
+    return ScreenUtilInit(
+      designSize: const Size(375,812),
+      minTextAdapt: true,
+      child: MaterialApp(
+        title: 'Flutter Maps',
+        debugShowCheckedModeBanner: false,
+        initialRoute: isLoggedIn ? Routes.mapScreen : Routes.loginScreen,
+        onGenerateRoute: appRouter.generateRoutes,
+      ),
     );
   }
 }
