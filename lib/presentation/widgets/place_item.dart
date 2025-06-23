@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/data/models/place_suggestion_model.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class PLaceItem extends StatelessWidget {
   final PlaceSuggestionModel placeSuggestionModel;
@@ -12,16 +13,16 @@ class PLaceItem extends StatelessWidget {
         .replaceAll(placeSuggestionModel.description.split(',')[0], '');
     return Container(
       width: double.infinity,
-      margin: const EdgeInsetsDirectional.all(8),
-      padding: const EdgeInsetsDirectional.all(4),
+      margin: EdgeInsetsDirectional.all(8.w),
+      padding: EdgeInsetsDirectional.all(4.w),
       decoration: BoxDecoration(
-          color: Colors.white, borderRadius: BorderRadius.circular(8)),
+          color: Colors.white, borderRadius: BorderRadius.circular(8.r)),
       child: Column(
         children: [
           ListTile(
             leading: Container(
-              width: 40,
-              height: 40,
+              width: 40.w,
+              height: 40.h,
               decoration: const BoxDecoration(
                   shape: BoxShape.circle, color: Colors.blue),
               child: const Icon(
@@ -34,17 +35,17 @@ class PLaceItem extends StatelessWidget {
                   children: [
                     TextSpan(
                       text: '${placeSuggestionModel.description.split(','[0] )}' ,
-                      style: const TextStyle(
+                      style: TextStyle(
                           color: Colors.black,
-                          fontSize: 18,
+                          fontSize: 18.sp,
                           fontWeight: FontWeight.bold
                       ),
                     ),
                     TextSpan(
                       text: subTitle.substring(2) ,
-                      style: const TextStyle(
+                      style: TextStyle(
                           color: Colors.black,
-                          fontSize: 16,
+                          fontSize: 16.sp,
                           fontWeight: FontWeight.normal
                       ),
                     ),

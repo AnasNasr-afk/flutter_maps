@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../helpers/color_manager.dart';
 
 class PrimaryButton extends StatelessWidget {
@@ -15,7 +16,6 @@ class PrimaryButton extends StatelessWidget {
   final List<BoxShadow>? boxShadow;
   final Widget? child;
 
-
   const PrimaryButton({
     super.key,
     required this.text,
@@ -25,8 +25,8 @@ class PrimaryButton extends StatelessWidget {
     this.textStyle,
     this.width = 340,
     this.height = 49,
-    this.backgroundColor ,
-    this.textColor ,
+    this.backgroundColor,
+    this.textColor,
     this.borderRadius = 30,
     this.boxShadow,
     this.child,
@@ -37,7 +37,7 @@ class PrimaryButton extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         boxShadow: boxShadow,
-        borderRadius: BorderRadius.circular(borderRadius),
+        borderRadius: BorderRadius.circular(borderRadius.r),
       ),
       child: TextButton(
         onPressed: onPressed,
@@ -46,22 +46,23 @@ class PrimaryButton extends StatelessWidget {
           backgroundColor: WidgetStatePropertyAll(backgroundColor ?? ColorManager.secondary),
           shape: WidgetStatePropertyAll(
             RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(borderRadius),
+              borderRadius: BorderRadius.circular(borderRadius.r),
             ),
           ),
           fixedSize: WidgetStatePropertyAll(
-            Size(width, height),
+            Size(width.w, height.h),
           ),
         ),
-        child: Text(
-          text,
-          style: textStyle ??
-              TextStyle(
-                color: textColor ?? ColorManager.white,
-                fontSize: fontSize,
-                fontWeight: fontWeight,
-              ),
-        ),
+        child: child ??
+            Text(
+              text,
+              style: textStyle ??
+                  TextStyle(
+                    color: textColor ?? ColorManager.white,
+                    fontSize: fontSize.sp,
+                    fontWeight: fontWeight,
+                  ),
+            ),
       ),
     );
   }

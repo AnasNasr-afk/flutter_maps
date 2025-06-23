@@ -1,10 +1,10 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_maps/helpers/shared_pref_helper.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../business_logic/issueCubit/issue_cubit.dart';
@@ -21,31 +21,31 @@ void showPrivacyPolicyDialog(BuildContext context) {
       elevation: 10,
       backgroundColor: Colors.white,
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(24.w),
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
                   Icon(Icons.privacy_tip_outlined,
-                      size: 32, color: Colors.orange),
-                  SizedBox(width: 10),
+                      size: 32.w, color: Colors.orange),
+                  SizedBox(width: 10.w),
                   Text(
                     'Privacy Policy',
                     style: TextStyle(
-                      fontSize: 22,
+                      fontSize: 22.sp,
                       fontWeight: FontWeight.bold,
                       color: Colors.black87,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12.h),
               const Divider(),
-              const SizedBox(height: 12),
-              const Text(
+              SizedBox(height: 12.h),
+              Text(
                 'Last updated: June 16, 2025\n\n'
                 'CleanCity respects your privacy and is committed to protecting your personal data.\n\n'
                 '1. What Data We Collect:\n'
@@ -60,9 +60,9 @@ void showPrivacyPolicyDialog(BuildContext context) {
                 'You can request to delete your data at any time by emailing us.\n\n'
                 'We never share or sell your data to third parties.\n\n'
                 '📧 For questions, contact: anas.nasr132003@gmail.com',
-                style: TextStyle(fontSize: 14, height: 1.4),
+                style: TextStyle(fontSize: 14.sp, height: 1.4.h),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
@@ -88,8 +88,8 @@ void showReportBottomSheet(BuildContext context) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
     ),
     builder: (bottomSheetContext) => BlocProvider.value(
       value: BlocProvider.of<MapCubit>(context),
@@ -101,75 +101,58 @@ void showReportBottomSheet(BuildContext context) {
     ),
   );
 }
-// void showReportBottomSheet(BuildContext context) {
-//   showModalBottomSheet(
-//     context: context,
-//     isScrollControlled: true,
-//     shape: const RoundedRectangleBorder(
-//       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-//     ),
-//     builder: (bottomSheetContext) => BlocProvider.value(
-//       value: BlocProvider.of<MapCubit>(context),
-//       // ✅ Pass the existing MapCubit
-//       child: BlocProvider(
-//         create: (_) => IssueCubit(),
-//         child: const ReportIssueBottomSheet(),
-//       ),
-//     ),
-//   );
-// }
 
 void showModernAboutDialog(BuildContext context) {
   final messenger = ScaffoldMessenger.of(context);
   showDialog(
     context: context,
     builder: (context) => Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
       elevation: 10,
       backgroundColor: Colors.white,
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(24.w),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Row(
+            Row(
               children: [
-                Icon(Icons.cleaning_services, size: 32, color: Colors.orange),
-                SizedBox(width: 10),
+                Icon(Icons.cleaning_services, size: 32.w, color: Colors.orange),
+                SizedBox(width: 10.w),
                 Text(
                   'Clean City',
                   style: TextStyle(
-                    fontSize: 22,
+                    fontSize: 22.sp,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12.h),
             const Divider(),
-            const SizedBox(height: 12),
-            const Text(
+            SizedBox(height: 12.h),
+            Text(
               '🌍 Community-Powered Reporting',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
             ),
-            const SizedBox(height: 6),
-            const Text(
+            SizedBox(height: 6.h),
+            Text(
               'CleanCity helps citizens easily report garbage, potholes, broken lights, and other city issues using their current location.',
-              style: TextStyle(fontSize: 14, height: 1.4),
+              style: TextStyle(fontSize: 14.sp, height: 1.4.h),
             ),
-            const SizedBox(height: 16),
-            const Text(
+            SizedBox(height: 16.h),
+            Text(
               '🤝 How You Help',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
             ),
-            const SizedBox(height: 6),
-            const Text(
+            SizedBox(height: 6.h),
+            Text(
               'By submitting reports, you contribute to a cleaner, safer, and more organized city. Every report counts.',
-              style: TextStyle(fontSize: 14, height: 1.4),
+              style: TextStyle(fontSize: 14.sp, height: 1.4.h),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             GestureDetector(
               onTap: () async {
                 final Uri emailUri = Uri(
@@ -188,36 +171,36 @@ void showModernAboutDialog(BuildContext context) {
                   );
                 }
               },
-              child: const Text(
+              child: Text(
                 '📧 Contact Us: anas.nasr132003@gmail.com',
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 14.sp,
                   color: Colors.blue,
                   decoration: TextDecoration.underline,
                 ),
               ),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8.h),
             GestureDetector(
               onTap: () {
                 Navigator.pop(context);
                 showPrivacyPolicyDialog(context);
               },
-              child: const Text(
+              child: Text(
                 '🔒 View our Privacy Policy',
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 14.sp,
                   color: Colors.blue,
                   decoration: TextDecoration.underline,
                 ),
               ),
             ),
-            const SizedBox(height: 12),
-            const Text(
+            SizedBox(height: 12.h),
+            Text(
               '📱 Version: 1.0.0',
-              style: TextStyle(fontSize: 13, color: Colors.grey),
+              style: TextStyle(fontSize: 13.sp, color: Colors.grey),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20.h),
             Align(
               alignment: Alignment.centerRight,
               child: TextButton(
@@ -251,45 +234,45 @@ void callSupport(BuildContext context) async {
 void logOut(BuildContext context) async {
   final shouldLogout = await showDialog<bool>(
     context: context,
-    barrierDismissible: false, // prevent dismiss on outside tap
+    barrierDismissible: false,
     builder: (context) => AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
       backgroundColor: Colors.white,
-      title: const Text(
+      title: Text(
         'Confirm Logout',
         style: TextStyle(
-          fontSize: 20,
+          fontSize: 20.sp,
           fontWeight: FontWeight.bold,
           color: Colors.black,
         ),
       ),
-      content: const Text(
+      content: Text(
         'Are you sure you want to logout?',
         style: TextStyle(
-          fontSize: 16,
+          fontSize: 16.sp,
           color: Colors.black87,
         ),
       ),
-      actionsPadding: const EdgeInsets.only(right: 16, bottom: 12),
+      actionsPadding: EdgeInsets.only(right: 16.w, bottom: 12.h),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context, true),
-          child: const Text(
+          child: Text(
             'Logout',
             style: TextStyle(
               color: Colors.redAccent,
-              fontSize: 15,
+              fontSize: 15.sp,
               fontWeight: FontWeight.w600,
             ),
           ),
         ),
         TextButton(
           onPressed: () => Navigator.pop(context, false),
-          child: const Text(
+          child: Text(
             'Cancel',
             style: TextStyle(
               color: Colors.grey,
-              fontSize: 15,
+              fontSize: 15.sp,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -312,8 +295,6 @@ void logOut(BuildContext context) async {
   }
 }
 
-
-
 IconData getStatusIcon(String status) {
   switch (status.toLowerCase()) {
     case 'resolved':
@@ -328,68 +309,20 @@ IconData getStatusIcon(String status) {
   }
 }
 
-// Widget buildHandle() {
-//   return Center(
-//     child: Container(
-//       width: 48,
-//       height: 5,
-//       margin: const EdgeInsets.only(bottom: 16),
-//       decoration: BoxDecoration(
-//         color: Colors.grey.shade300.withValues(alpha: 0.8),
-//         borderRadius: BorderRadius.circular(10),
-//       ),
-//     ),
-//   );
-// }
 Widget buildHandle() {
   return Center(
     child: Container(
-      width: 40,
-      height: 5,
-      margin: const EdgeInsets.only(bottom: 16),
+      width: 40.w,
+      height: 5.h,
+      margin: EdgeInsets.only(bottom: 16.h),
       decoration: BoxDecoration(
         color: Colors.grey[400],
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(8.r),
       ),
     ),
   );
 }
 
-
-
-// Widget buildSection(
-//     BuildContext context, {
-//       required String title,
-//       required IconData icon,
-//       Color? iconColor,
-//       required Animation<double> animation,
-//       required Widget child,
-//     }) {
-//   return FadeTransition(
-//     opacity: animation,
-//     child: Column(
-//       crossAxisAlignment: CrossAxisAlignment.start,
-//       children: [
-//         Row(
-//           children: [
-//             Icon(icon, color: iconColor ?? Colors.black54, size: 20),
-//             const SizedBox(width: 8),
-//             Text(
-//               title,
-//               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-//                 fontWeight: FontWeight.bold,
-//                 color: Colors.black87,
-//               ),
-//             ),
-//           ],
-//         ),
-//         const SizedBox(height: 8),
-//         child,
-//         const SizedBox(height: 16),
-//       ],
-//     ),
-//   );
-// }
 Widget buildSection(
   BuildContext context, {
   required String title,
@@ -401,11 +334,11 @@ Widget buildSection(
   return FadeTransition(
     opacity: animation,
     child: Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      padding: const EdgeInsets.all(16),
+      margin: EdgeInsets.symmetric(vertical: 8.h),
+      padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.9),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.08),
@@ -420,8 +353,8 @@ Widget buildSection(
           Row(
             children: [
               if (icon != null) ...[
-                Icon(icon, color: iconColor ?? Colors.black54, size: 20),
-                const SizedBox(width: 8),
+                Icon(icon, color: iconColor ?? Colors.black54, size: 20.w),
+                SizedBox(width: 8.w),
               ],
               Expanded(
                 child: Text(
@@ -434,7 +367,7 @@ Widget buildSection(
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10.h),
           child,
         ],
       ),
@@ -442,89 +375,37 @@ Widget buildSection(
   );
 }
 
-
-
-// Widget buildImage(BuildContext context, String path) {
-//   final bool isNetwork = path.startsWith('http');
-//
-//   final imageWidget = isNetwork
-//       ? Image.network(path, fit: BoxFit.cover, errorBuilder: (_, __, ___) => buildErrorImage())
-//       : File(path).existsSync()
-//       ? Image.file(File(path), fit: BoxFit.cover)
-//       : buildErrorImage();
-//
-//   return GestureDetector(
-//     onTap: () {
-//       showDialog(
-//         context: context,
-//         builder: (context) => Dialog(
-//           backgroundColor: Colors.transparent,
-//           child: ClipRRect(
-//             borderRadius: BorderRadius.circular(16),
-//             child: imageWidget,
-//           ),
-//         ),
-//       );
-//     },
-//     child: Hero(
-//       tag: path,
-//       child: ClipRRect(
-//         borderRadius: BorderRadius.circular(16),
-//         child: SizedBox(
-//           height: 220,
-//           width: double.infinity,
-//           child: imageWidget,
-//         ),
-//       ),
-//     ),
-//   );
-// }
 Widget buildImage(BuildContext context, String imagePath) {
   try {
     final bytes = base64Decode(imagePath);
     return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(16.r),
       child: Image.memory(
         bytes,
-        height: 220,
-        width: double.infinity,
+        height: 220.h,
+        width: double.infinity.w,
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) => buildErrorImage(),
       ),
     );
   } catch (e) {
-    // Fallback for old URL-based images
     return Image.network(
       imagePath,
-      height: 220,
-      width: double.infinity,
+      height: 220.h,
+      width: double.infinity.w,
       fit: BoxFit.cover,
       errorBuilder: (context, error, stackTrace) => buildErrorImage(),
     );
   }
 }
 
-
-
-// Widget buildErrorImage() {
-//   return Container(
-//     height: 220,
-//     width: double.infinity,
-//     alignment: Alignment.center,
-//     decoration: BoxDecoration(
-//       color: Colors.grey[300],
-//       borderRadius: BorderRadius.circular(16),
-//     ),
-//     child: const Icon(Icons.broken_image_outlined, size: 40, color: Colors.grey),
-//   );
-// }
 Widget buildErrorImage() {
   return Container(
-    height: 220,
-    width: double.infinity,
+    height: 220.h,
+    width: double.infinity.w,
     decoration: BoxDecoration(
       color: Colors.grey.shade200,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(16.r),
     ),
     child: const Center(
       child: Text(
@@ -535,44 +416,31 @@ Widget buildErrorImage() {
   );
 }
 
-// Widget buildStatusPill(String status) {
-//   return Container(
-//     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-//     decoration: BoxDecoration(
-//       color: getStatusColor(status),
-//       borderRadius: BorderRadius.circular(16),
-//     ),
-//     child: Text(
-//       IssueStatusExtension.fromString(status).label,
-//       style: const TextStyle(color: Colors.white, fontSize: 12),
-//     ),
-//   );
-// }
 Widget buildStatusPill(String status) {
   final color = getStatusColor(status);
   return AnimatedContainer(
     duration: const Duration(milliseconds: 400),
-    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
     decoration: BoxDecoration(
       gradient: LinearGradient(
         colors: [color.withValues(alpha: 0.2), color.withValues(alpha: 0.3)],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       ),
-      borderRadius: BorderRadius.circular(20),
-      border: Border.all(color: color.withValues(alpha: 0.5), width: 1.5),
+      borderRadius: BorderRadius.circular(20.r),
+      border: Border.all(color: color.withValues(alpha: 0.5), width: 1.5.w),
     ),
     child: Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(getStatusIcon(status), color: color, size: 18),
-        const SizedBox(width: 8),
+        Icon(getStatusIcon(status), color: color, size: 18.w),
+        SizedBox(width: 8.h),
         Text(
           status[0].toUpperCase() + status.substring(1),
           style: TextStyle(
             color: color,
             fontWeight: FontWeight.w700,
-            fontSize: 14,
+            fontSize: 14.sp,
             letterSpacing: 0.8,
           ),
         ),
@@ -580,22 +448,6 @@ Widget buildStatusPill(String status) {
     ),
   );
 }
-
-
-
-
-Widget buildSectionHeader(String title) {
-  return Row(
-    children: [
-      Text(title,
-          style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-              fontSize: 16)),
-    ],
-  );
-}
-
 
 Color getStatusColor(String status) {
   switch (status.toLowerCase()) {
@@ -611,59 +463,3 @@ Color getStatusColor(String status) {
       return Colors.grey.shade600;
   }
 }
-
-
-bool hasValidImage(String? url) => url != null && url.trim().isNotEmpty;
-
-Widget buildIssueImage(String? imagePath) {
-  if (imagePath == null || imagePath.trim().isEmpty) {
-    return _placeholderImageWidget();
-  }
-
-  final isNetwork = imagePath.startsWith('http');
-
-  if (isNetwork) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: Image.network(
-        imagePath,
-        fit: BoxFit.cover,
-        width: double.infinity,
-        errorBuilder: (context, error, stackTrace) {
-          return _brokenImageWidget();
-        },
-      ),
-    );
-  } else {
-    final file = File(imagePath);
-    if (!file.existsSync()) {
-      return _brokenImageWidget();
-    }
-
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: Image.file(
-        file,
-        fit: BoxFit.cover,
-        width: double.infinity,
-        errorBuilder: (context, error, stackTrace) {
-          return _brokenImageWidget();
-        },
-      ),
-    );
-  }
-}
-
-Widget _placeholderImageWidget() => Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      color: Colors.grey[300],
-      child: const Icon(Icons.image_not_supported, size: 40),
-    );
-
-Widget _brokenImageWidget() => Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      color: Colors.grey[200],
-      child: const Icon(Icons.broken_image, size: 40, color: Colors.grey),
-    );

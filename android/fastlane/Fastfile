@@ -8,7 +8,7 @@ platform :android do
     sh "flutter build apk --release" # two lines to build the APK automatically
     firebase_app_distribution(
         app: "1:199041491527:android:b7441a0df8a21a048b4762",
-        firebase_cli_token: "1//03HggdBOW_JeRCgYIARAAGAMSNwF-L9Ir2kxroU5-kdm7Go5thBjXvcS0KSC9r52nRhVrl_daR0Si2eVZBJ6GY0nvqE4WmMVRRAM",
+        firebase_cli_token: ENV["FIREBASE_CLI_TOKEN"], # Set this in your environment variables
         android_artifact_type: "APK",
         android_artifact_path: "../build/app/outputs/flutter-apk/app-release.apk",
         testers: "anas.mostafax0@gmail.com",

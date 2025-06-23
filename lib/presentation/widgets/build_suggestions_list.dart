@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_maps/data/models/place_details_model.dart';
 import 'package:flutter_maps/data/models/place_suggestion_model.dart';
 import 'package:flutter_maps/presentation/widgets/place_item.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:uuid/uuid.dart';
 import '../../business_logic/mapCubit/map_cubit.dart';
 
@@ -17,7 +18,7 @@ class BuildSuggestionsList extends StatelessWidget {
 
   void getSelectedPlaceLocation(BuildContext context, String placeId, PlaceSuggestionModel placeSuggestionModel) {
     final sessionToken = const Uuid().v4();
-    MapCubit.get(context).emitPlaceDetails(placeId, sessionToken, placeSuggestionModel); // ✅ Pass the suggestion model
+    MapCubit.get(context).emitPlaceDetails(placeId, sessionToken, placeSuggestionModel);
   }
 
 
@@ -26,7 +27,7 @@ class BuildSuggestionsList extends StatelessWidget {
     MapCubit cubit = MapCubit.get(context);
 
     return SizedBox(
-      height: 300,
+      height: 400.h,
       child: ListView.builder(
         shrinkWrap: true,
         physics: const BouncingScrollPhysics(),

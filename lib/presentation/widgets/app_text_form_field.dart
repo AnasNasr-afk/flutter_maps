@@ -1,6 +1,7 @@
 
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../helpers/color_manager.dart';
 import '../../helpers/text_styles.dart';
@@ -60,40 +61,40 @@ class AppTextFormField extends StatelessWidget {
         prefixText: prefixText,
         isDense: true,
         contentPadding: contentPadding ??
-            const EdgeInsets.symmetric(
-              horizontal: 20,
-              vertical: 18,
+             EdgeInsets.symmetric(
+              horizontal: 20.w,
+              vertical: 18.h,
             ),
 
         focusedBorder: focusedBorder ??
             OutlineInputBorder(
-              borderSide: const BorderSide(
+              borderSide: BorderSide(
                 color: ColorManager.mainBlue,
-                width: 1.3,
+                width: 1.3.w,
               ),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(16.r),
             ),
         enabledBorder: enabledBorder ??
             OutlineInputBorder(
-              borderSide:  const BorderSide(
+              borderSide: BorderSide(
                 color: Colors.grey,
-                width: 1.3,
+                width: 1.3.w,
               ),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(16.r),
             ),
         errorBorder: OutlineInputBorder(
-          borderSide: const BorderSide(
+          borderSide: BorderSide(
             color: Colors.red,
-            width: 1.3,
+            width: 1.3.w,
           ),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(16.r),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderSide: const BorderSide(
+          borderSide: BorderSide(
             color: Colors.red,
-            width: 1.3,
+            width: 1.3.w,
           ),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(16.r),
         ),
         hintStyle: hintStyle ??
             TextStyles.font14GreyMedium,
