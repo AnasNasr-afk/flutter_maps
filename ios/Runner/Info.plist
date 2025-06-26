@@ -103,5 +103,7 @@
 	</array>
 	<key>io.flutter.embedded_views_preview</key>
 	<true/>
+	<key>GOOGLE_API_KEY</key>
+    <string>AIzaSyBHIZyOW3txJOJTag1Pe1OzYqLsj3p7ZL8</string>
 </dict>
 </plist>

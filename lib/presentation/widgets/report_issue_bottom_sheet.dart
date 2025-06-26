@@ -74,9 +74,9 @@ class _ReportIssueBottomSheetState extends State<ReportIssueBottomSheet> {
       },
       child: DraggableScrollableSheet(
         expand: false,
-        initialChildSize: 0.75.sp,
-        minChildSize: 0.5.sp,
-        maxChildSize: 0.95.sp,
+        initialChildSize: 0.75,
+        minChildSize: 0.5,
+        maxChildSize: 0.95,
         builder: (context, scrollController) {
           return Container(
             decoration:  BoxDecoration(

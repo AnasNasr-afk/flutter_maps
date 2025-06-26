@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_maps/business_logic/issueCubit/issue_states.dart';
 import 'package:flutter_maps/data/models/issue_model.dart';
 import 'package:flutter_maps/data/models/user_model.dart';
+import 'package:flutter_maps/helpers/notification_helper.dart';
 import 'package:flutter_maps/presentation/widgets/app_markers.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -39,7 +40,6 @@ class IssueCubit extends Cubit<IssueStates> {
     selectedCategory = category;
     emit(IssueInitialState()); // Trigger UI update
   }
-
 
   Future<void> imagePickerPhoto(ImageSource imageSource) async {
     emit(ImagePickerLoadingState());
@@ -152,7 +152,8 @@ class IssueCubit extends Cubit<IssueStates> {
     }
 
     if (currentPosition == null) {
-      emit(IssueSubmitFailureState('Location not available. Please enable location services.'));
+      emit(IssueSubmitFailureState(
+          'Location not available. Please enable location services.'));
       return;
     }
 
@@ -189,7 +190,8 @@ class IssueCubit extends Cubit<IssueStates> {
       // Compress and encode image to Base64
       try {
         final tempDir = Directory.systemTemp;
-        final compressedPath = '${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}_compressed.jpg';
+        final compressedPath =
+            '${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}_compressed.jpg';
 
         final compressedImage = await FlutterImageCompress.compressAndGetFile(
           imageFile!.path,
@@ -206,8 +208,10 @@ class IssueCubit extends Cubit<IssueStates> {
         final imageBytes = await compressedImage.readAsBytes();
         final imageSizeKB = imageBytes.length / 1024;
         if (imageSizeKB > 750) {
-          debugPrint('Compressed image size: ${imageSizeKB}KB, may exceed Firestore limit');
-          emit(IssueSubmitFailureState('Image too large after compression. Try a smaller image.'));
+          debugPrint(
+              'Compressed image size: ${imageSizeKB}KB, may exceed Firestore limit');
+          emit(IssueSubmitFailureState(
+              'Image too large after compression. Try a smaller image.'));
           return;
         }
 
@@ -215,7 +219,8 @@ class IssueCubit extends Cubit<IssueStates> {
         await File(compressedImage.path).delete();
       } catch (e) {
         debugPrint('Image compression/encoding failed: $e');
-        emit(IssueSubmitFailureState('Failed to process image. Please try a smaller image.'));
+        emit(IssueSubmitFailureState(
+            'Failed to process image. Please try a smaller image.'));
         return;
       }
 
@@ -245,11 +250,21 @@ class IssueCubit extends Cubit<IssueStates> {
       imageFile = null;
       selectedCategory = null;
       currentPosition = null;
+      try {
+        await NotificationHelper.notifyAdmins(
+          "📢 New Issue Submitted",
+          "${currentUser.name} just submitted an issue !",
+        );
+      } catch (e) {
+        debugPrint('❌ Notification failed: $e'); // ⬅️ Likely failure here
+      }
+
 
       emit(IssueSubmitSuccessState());
     } catch (e) {
       debugPrint('Issue submission failed: $e');
-      emit(IssueSubmitFailureState('Failed to submit issue. Please try again.'));
+      emit(
+          IssueSubmitFailureState('Failed to submit issue. Please try again.'));
     }
   }
 
@@ -261,12 +276,13 @@ class IssueCubit extends Cubit<IssueStates> {
 
       if (adminImage != null) {
         final tempDir = Directory.systemTemp;
-        final compressedPath = '${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}_compressed.jpg';
+        final compressedPath =
+            '${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}_compressed.jpg';
 
         final compressedImage = await FlutterImageCompress.compressAndGetFile(
           adminImage.path,
           compressedPath,
-          quality: 20, // 🔽 Lower = better compression
+          quality: 20,
           minWidth: 640,
           minHeight: 480,
         );
@@ -279,17 +295,14 @@ class IssueCubit extends Cubit<IssueStates> {
 
         final bytes = await compressedImage.readAsBytes();
         final imageSizeKB = bytes.length / 1024;
-        debugPrint('✅ Admin image encoded. Size: ${imageSizeKB.toStringAsFixed(2)} KB');
 
         if (imageSizeKB > 950) {
-          debugPrint('❌ Compressed image too large: ${imageSizeKB.toStringAsFixed(2)} KB');
-          emit(UpdateIssueErrorState('Image too large even after compression. Try a smaller image.'));
+          emit(UpdateIssueErrorState('Image too large even after compression.'));
           return;
         }
 
         imageBase64 = base64Encode(bytes);
-
-        await File(compressedImage.path).delete(); // Clean up
+        await File(compressedImage.path).delete();
       }
 
       final dataToUpdate = {
@@ -297,14 +310,41 @@ class IssueCubit extends Cubit<IssueStates> {
         if (imageBase64 != null) 'adminResolvedImage': imageBase64,
       };
 
-      debugPrint('📄 Document ID: $docId');
-      debugPrint('🆕 New status: $newStatus');
-      debugPrint('📤 Sending data to Firestore: $dataToUpdate');
-
       await FirebaseFirestore.instance
           .collection('issues')
           .doc(docId)
           .update(dataToUpdate);
+
+      // ✅ Notify the user who submitted the issue
+      final issueSnapshot = await FirebaseFirestore.instance
+          .collection('issues')
+          .doc(docId)
+          .get();
+
+      if (issueSnapshot.exists) {
+        final uId = issueSnapshot.data()?['uId'];
+        if (uId != null) {
+          final userSnapshot = await FirebaseFirestore.instance
+              .collection('users')
+              .doc(uId)
+              .get();
+
+          if (userSnapshot.exists) {
+            final token = userSnapshot.data()?['fcmToken'];
+            final userName = userSnapshot.data()?['name'] ?? "User";
+
+            if (token != null && token is String && token.isNotEmpty) {
+              await NotificationHelper.sendNotification(
+                '✅ Issue Update',
+                'Hi $userName, your issue status is now "$newStatus"',
+                token,
+              );
+            } else {
+              debugPrint('⚠️ No FCM token found for user $uId');
+            }
+          }
+        }
+      }
 
       emit(UpdateIssueSuccessState());
     } catch (e) {
@@ -312,8 +352,6 @@ class IssueCubit extends Cubit<IssueStates> {
       emit(UpdateIssueErrorState(e.toString()));
     }
   }
-
-
 
 
   Future<void> pickResolvedImage(ImageSource imageSource) async {
@@ -338,6 +376,4 @@ class IssueCubit extends Cubit<IssueStates> {
     resolvedImageFile = null;
     emit(ResolvedImagePickerSuccessState());
   }
-
 }
-

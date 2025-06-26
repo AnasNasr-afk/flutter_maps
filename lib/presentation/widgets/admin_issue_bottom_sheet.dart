@@ -59,7 +59,9 @@ class _AdminIssueBottomSheetState extends State<AdminIssueBottomSheet>
 
   Uint8List? get resolvedImageBytes {
     if (widget.adminResolvedImage == null ||
-        widget.adminResolvedImage!.isEmpty) return null;
+        widget.adminResolvedImage!.isEmpty) {
+      return null;
+    }
     try {
       return base64Decode(widget.adminResolvedImage!);
     } catch (_) {
