@@ -23,29 +23,30 @@ class WebService {
         'input': place,
         'types': 'address',
         'components': 'country:eg',
-        'key': googleMapsApiKey, // ✅ Use platform-aware key
+        'key': googleMapsApiKey, // ✅ Platform-aware key
         'sessiontoken': sessionToken,
       });
-      debugPrint('Dio Response: ${response.data}');
+      debugPrint('✅ Dio Suggestion Response: ${response.data}');
       return response.data['predictions'] ?? [];
     } catch (e) {
-      debugPrint('WebService Error: $e');
+      debugPrint('❌ Suggestion Error: $e');
       return [];
     }
   }
 
-  Future<dynamic> getPlaceDetails(String placeId, String sessionToken) async {
+  Future<Map<String, dynamic>> getPlaceDetails(String placeId, String sessionToken) async {
     try {
       Response response = await dio.get(placeLocationBaseUrl, queryParameters: {
         'place_id': placeId,
         'fields': 'geometry',
-        'key': googleMapsApiKey, // ✅ Use platform-aware key
+        'key': googleMapsApiKey, // ✅ Platform-aware key
         'sessiontoken': sessionToken,
       });
+      debugPrint('✅ Place Details: ${response.data}');
       return response.data;
     } catch (e) {
-      debugPrint('WebService Error: $e');
-      return [];
+      debugPrint('❌ Place Details Error: $e');
+      return {};
     }
   }
 }
@@ -54,7 +55,7 @@ String get googleMapsApiKey {
   if (Platform.isAndroid) {
     return dotenv.env['GOOGLE_API_KEY_ANDROID'] ?? '';
   } else if (Platform.isIOS) {
-    return dotenv.env['GOOGLE_API_KEY'] ?? '';
+    return dotenv.env['GOOGLE_API_KEY_IOS'] ?? ''; // Update if needed
   } else {
     return '';
   }

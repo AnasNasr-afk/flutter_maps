@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,6 +13,7 @@ import '../business_logic/mapCubit/map_cubit.dart';
 import '../presentation/widgets/report_issue_bottom_sheet.dart';
 import '../router/routes.dart';
 import 'app_strings.dart';
+
 
 void showPrivacyPolicyDialog(BuildContext context) {
   showDialog(
@@ -463,3 +465,5 @@ Color getStatusColor(String status) {
       return Colors.grey.shade600;
   }
 }
+
+

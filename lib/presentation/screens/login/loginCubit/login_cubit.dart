@@ -1,9 +1,13 @@
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_maps/helpers/app_strings.dart';
 import 'package:flutter_maps/helpers/shared_pref_helper.dart';
-
+import '../../../../helpers/notification_helper.dart';
 import 'login_states.dart';
 
 class LoginCubit extends Cubit<LoginStates> {
@@ -33,10 +37,45 @@ class LoginCubit extends Cubit<LoginStates> {
       );
 
       final uid = credential.user?.uid;
-      debugPrint('✅ Login successful. UID: $uid');
+      final username = credential.user?.displayName ?? 'User';
 
       if (uid != null) {
-        await saveToken(uid);
+        // 🔐 Store UID in local storage
+        await SharedPrefHelper.setData(userId, uid);
+
+        String? token;
+
+        if (Platform.isIOS) {
+          // ✅ Wait for APNs token (iOS only)
+          String? apnsToken;
+          int retries = 10;
+          while (apnsToken == null && retries-- > 0) {
+            apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+            await Future.delayed(const Duration(milliseconds: 500));
+          }
+
+          if (apnsToken != null) {
+            token = await FirebaseMessaging.instance.getToken();
+          } else {
+            debugPrint('❌ Could not retrieve APNs token.');
+          }
+        } else {
+          // ✅ Android FCM token
+          token = await FirebaseMessaging.instance.getToken();
+        }
+
+        // ✅ Save FCM token to Firestore
+        if (token != null && token.isNotEmpty) {
+          debugPrint('📱 Android FCM token: $token'); // ADD THIS
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(uid)
+              .set({'fcmToken': token}, SetOptions(merge: true));
+        }
+        else {
+          debugPrint('⚠️ No FCM token available');
+        }
+
         emit(LoginSuccessState());
       } else {
         debugPrint('⚠️ Login succeeded but UID is null');
@@ -48,8 +87,12 @@ class LoginCubit extends Cubit<LoginStates> {
     }
   }
 
-  Future<void> saveToken(String token) async {
+
+
+Future<void> saveToken(String token) async {
     await SharedPrefHelper.setData(userId, token);
   }
+
+
 
 }

@@ -7,19 +7,64 @@ import 'package:flutter_maps/router/app_router.dart';
 import 'package:flutter_maps/router/routes.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'helpers/message_config.dart';
+
+
+import 'package:firebase_messaging/firebase_messaging.dart';
+
+
+import 'dart:io';
+
+
+
+
 void main() async {
+  // 🔧 Required for any async work before runApp
   WidgetsFlutterBinding.ensureInitialized();
+
+  // 📦 Load .env file if needed
   await dotenv.load(fileName: ".env");
+
+  // 🔥 Initialize Firebase
   await Firebase.initializeApp();
 
+  // 🎯 Set up background FCM handler
+  FirebaseMessaging.onBackgroundMessage(MessageConfig.firebaseMessagingBackgroundHandler);
+
+  // 🔔 Setup FCM and local notifications
+  await MessageConfig.initFirebaseMessaging();
+
+  // 📱 Get FCM token safely for iOS/Android
+  String? token;
+  if (Platform.isAndroid) {
+    token = await FirebaseMessaging.instance.getToken();
+    print('📱 Android FCM Token: $token');
+  } else if (Platform.isIOS) {
+    await Future.delayed(const Duration(seconds: 3)); // Small wait for APNs
+    final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+
+    if (apnsToken != null) {
+      token = await FirebaseMessaging.instance.getToken();
+      print('🍎 iOS FCM Token: $token');
+    } else {
+      ('⚠️ iOS APNs token not yet set');
+    }
+  }
+
+  // 🧠 Check if user is already logged in
   final String userToken = await SharedPrefHelper.getString(userId);
   final bool isLoggedIn = userToken.isNotEmpty;
 
+  // 🚀 Run the app
   runApp(MapsApp(
     appRouter: AppRouter(),
     isLoggedIn: isLoggedIn,
   ));
 }
+
+
+
+
 
 class MapsApp extends StatelessWidget {
   final AppRouter appRouter;
