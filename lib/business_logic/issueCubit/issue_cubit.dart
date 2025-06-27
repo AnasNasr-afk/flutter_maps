@@ -255,11 +255,23 @@ class IssueCubit extends Cubit<IssueStates> {
           "📢 New Issue Submitted",
           "${currentUser.name} just submitted an issue !",
         );
+
       } catch (e) {
         debugPrint('❌ Notification failed: $e'); // ⬅️ Likely failure here
       }
+      final adminUsersSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('role', isEqualTo: 'admin')
+          .get();
 
-
+      for (final doc in adminUsersSnapshot.docs) {
+        final adminId = doc.id;
+        await NotificationHelper.addInAppNotification(
+          userId: adminId,
+          title: 'New Issue Submitted',
+          message: '${currentUser.name} submitted a new issue.',
+        );
+      }
       emit(IssueSubmitSuccessState());
     } catch (e) {
       debugPrint('Issue submission failed: $e');
@@ -335,10 +347,16 @@ class IssueCubit extends Cubit<IssueStates> {
 
             if (token != null && token is String && token.isNotEmpty) {
               await NotificationHelper.sendNotification(
-                '✅ Issue Update',
+                'Issue Update',
                 'Hi $userName, your issue status is now "$newStatus"',
                 token,
               );
+              await NotificationHelper.addInAppNotification(
+                userId: uId,
+                title: 'Issue Status Updated',
+                message: 'Your issue status is now "$newStatus".',
+              );
+
             } else {
               debugPrint('⚠️ No FCM token found for user $uId');
             }

@@ -5,6 +5,8 @@ class Routes {
 
   static const String userReportsScreen = '/userReportsScreen';
   static const String notificationsScreen = '/notificationsScreen';
+  static const String changePasswordScreen = '/changePasswordScreen';
+  static const String deleteAccountScreen = '/deleteAccountScreen';
 
 
 
