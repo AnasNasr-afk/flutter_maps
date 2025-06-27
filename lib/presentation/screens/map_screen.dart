@@ -61,6 +61,7 @@ class _MapScreenState extends State<MapScreen> {
   @override
   Widget build(BuildContext context) {
     final cubit = MapCubit.get(context);
+
     cubit.setContext(context);
 
     return Scaffold(
@@ -73,6 +74,7 @@ class _MapScreenState extends State<MapScreen> {
               builder: (context, state) {
                 return GoogleMap(
                   zoomControlsEnabled: false,
+
                   myLocationEnabled: true,
                   myLocationButtonEnabled: false,
                   initialCameraPosition: cameraPosition!,
@@ -205,6 +207,7 @@ class _MapScreenState extends State<MapScreen> {
 
       /// Drawer
       drawer: Drawer(
+
         backgroundColor: Colors.white,
         child: SafeArea(
           child: Column(
@@ -267,12 +270,6 @@ class _MapScreenState extends State<MapScreen> {
                 },
               ),
               BuildDrawerItem(
-                icon: Icons.language,
-                title: 'Change Language',
-                onTap: () {},
-              ),
-              SizedBox(height: 10.h),
-              BuildDrawerItem(
                 icon: Icons.support_agent,
                 title: 'Call Support',
                 onTap: () => callSupport(context),
@@ -280,14 +277,10 @@ class _MapScreenState extends State<MapScreen> {
               BuildDrawerItem(
                 icon: Icons.lock_outline,
                 title: 'Change Password',
-                onTap: () {},
+                onTap: () {
+                  Navigator.popAndPushNamed(context, Routes.changePasswordScreen);
+                },
               ),
-              BuildDrawerItem(
-                icon: Icons.delete_forever,
-                title: 'Delete Account',
-                onTap: () {},
-              ),
-              SizedBox(height: 10.h),
               BuildDrawerItem(
                 icon: Icons.info_outline,
                 title: 'About App',

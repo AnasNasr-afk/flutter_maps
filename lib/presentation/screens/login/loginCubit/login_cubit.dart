@@ -7,7 +7,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_maps/helpers/app_strings.dart';
 import 'package:flutter_maps/helpers/shared_pref_helper.dart';
-import '../../../../helpers/notification_helper.dart';
 import 'login_states.dart';
 
 class LoginCubit extends Cubit<LoginStates> {
