@@ -238,6 +238,7 @@ class IssueCubit extends Cubit<IssueStates> {
       await FirebaseFirestore.instance.collection('issues').add(issue.toJson());
 
       final marker = AppMarkers.buildIssueMarker(
+        docId: issue.uId,
         latitude: locationLat,
         longitude: locationLng,
         category: selectedCategory!,

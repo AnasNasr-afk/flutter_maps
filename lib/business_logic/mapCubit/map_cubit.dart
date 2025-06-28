@@ -23,7 +23,6 @@ class MapCubit extends Cubit<MapStates> {
 
   MapCubit(this.mapsRepo) : super(MapInitialState()) {
     debugPrint('[MapCubit] 🔄 Constructor called, initializing...');
-    loadMarkersFromFirebase();
     checkAdmin();
   }
 
@@ -31,6 +30,8 @@ class MapCubit extends Cubit<MapStates> {
   final Completer<GoogleMapController> mapController = Completer();
   final Set<Marker> _issueMarkers = {};
   final Set<Marker> _searchMarkers = {};
+  late BuildContext _mapContext;
+  bool isAdminChecked = false;
 
   Set<Marker> get allMarkers => {..._issueMarkers, ..._searchMarkers};
   FloatingSearchBarController searchBarController =
@@ -99,7 +100,6 @@ class MapCubit extends Cubit<MapStates> {
     emit(MapMarkerState(markers: allMarkers));
   }
 
-  late BuildContext _mapContext;
 
   void setContext(BuildContext context) {
     _mapContext = context;
@@ -192,6 +192,7 @@ class MapCubit extends Cubit<MapStates> {
               );
             }
           },
+          docId: doc.id,
         );
 
         fetchedMarkers.add(marker);
@@ -201,14 +202,17 @@ class MapCubit extends Cubit<MapStates> {
         ..clear()
         ..addAll(fetchedMarkers);
 
+      debugPrint('✅ Loaded ${_issueMarkers.length} markers from Firebase');
       emit(MapMarkerState(markers: allMarkers));
+
+
     } catch (e) {
       debugPrint('[MapCubit] ❌ Failed to load markers: $e');
       emit(MapErrorState());
     }
   }
 
-  bool isAdminChecked = false;
+
 
   void checkAdmin() async {
     final uid = FirebaseAuth.instance.currentUser?.uid;

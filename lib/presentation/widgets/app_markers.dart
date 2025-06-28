@@ -30,26 +30,28 @@ class AppMarkers {
   }
 
   static Marker buildIssueMarker({
-  required double latitude,
-  required double longitude,
-  required String category,
-  required String description,
-  required String status,
-  VoidCallback? onTap,
-  bool showInfoWindow = true,
+    required String docId,
+    required double latitude,
+    required double longitude,
+    required String category,
+    required String description,
+    required String status,
+    VoidCallback? onTap,
+    bool showInfoWindow = true,
   }) {
-  final color = getStatusColor(status);
+    final color = getStatusColor(status);
 
-  return Marker(
-  onTap: onTap,
-  position: LatLng(latitude, longitude),
-  markerId: MarkerId('issue_${DateTime.now().millisecondsSinceEpoch}'),
-  infoWindow: showInfoWindow
-  ? InfoWindow(title: category, snippet: description)
-      : InfoWindow.noText,
-  icon: BitmapDescriptor.defaultMarkerWithHue(_toHue(color)),
-  );
+    return Marker(
+      onTap: onTap,
+      position: LatLng(latitude, longitude),
+      markerId: MarkerId(docId), // 👈 Stable and consistent
+      infoWindow: showInfoWindow
+          ? InfoWindow(title: category, snippet: description)
+          : InfoWindow.noText,
+      icon: BitmapDescriptor.defaultMarkerWithHue(_toHue(color)),
+    );
   }
+
 
   static double _toHue(Color color) {
   if (color == Colors.green.shade600) return BitmapDescriptor.hueGreen;
