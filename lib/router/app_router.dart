@@ -12,7 +12,7 @@ import 'package:flutter_maps/router/routes.dart';
 
 import '../business_logic/userReportsCubit/user_reports_cubit.dart';
 import '../business_logic/userSecurityCubit/user_security_cubit.dart';
-import '../presentation/screens/delete_account_screen.dart';
+import '../presentation/screens/admin_analytics_screen.dart';
 import '../presentation/screens/login/login_screen.dart';
 import '../presentation/screens/signUp/signup_screen.dart';
 import '../presentation/screens/user_reports_screen.dart';
@@ -40,24 +40,21 @@ class AppRouter {
 
       case Routes.userReportsScreen:
         return MaterialPageRoute(
-            builder: (_) => BlocProvider(
-                create: (context) => UserReportsCubit(),
-                child: const UserReportsScreen()));
+            builder: (_) => BlocProvider.value(
+                value: MapCubit(MapsRepo(WebService())),
+                child: BlocProvider(
+                    create: (context) => UserReportsCubit(),
+                    child: const UserReportsScreen())));
 
       case Routes.notificationsScreen:
         return MaterialPageRoute(builder: (_) => const NotificationsScreen());
+      case Routes.adminAnalyticsScreen:
+        return MaterialPageRoute(builder: (_) => const AdminAnalyticsScreen());
       case Routes.changePasswordScreen:
         return MaterialPageRoute(
             builder: (_) => BlocProvider(
                 create: (context) => UserSecurityCubit(),
                 child: const ChangePasswordScreen()));
-      case Routes.deleteAccountScreen:
-        return MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (_) => UserSecurityCubit(),
-            child: const DeleteAccountScreen(),
-          ),
-        );
     }
     return null;
   }

@@ -133,7 +133,6 @@ class _AdminIssueBottomSheetState extends State<AdminIssueBottomSheet>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       buildHandle(),
-
                       buildSection(
                         context,
                         title: 'Category',
@@ -150,7 +149,6 @@ class _AdminIssueBottomSheetState extends State<AdminIssueBottomSheet>
                           ),
                         ),
                       ),
-
                       // Description
                       buildSection(
                         context,

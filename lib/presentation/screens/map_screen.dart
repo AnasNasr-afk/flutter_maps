@@ -36,6 +36,7 @@ class _MapScreenState extends State<MapScreen> {
     _initLocation();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       sessionToken = const Uuid().v4();
+      MapCubit.get(context).loadMarkersFromFirebase();
     });
   }
 
@@ -166,7 +167,9 @@ class _MapScreenState extends State<MapScreen> {
         builder: (context, state) {
           if (!cubit.isAdminChecked) {
             return FloatingActionButton(
-              onPressed: () {},
+              onPressed: () {
+
+              },
               backgroundColor: Colors.transparent,
               elevation: 0,
               child: TweenAnimationBuilder<double>(
@@ -190,7 +193,7 @@ class _MapScreenState extends State<MapScreen> {
             backgroundColor: Colors.amber,
             onPressed: () {
               if (cubit.isAdmin) {
-                // admin logic
+                Navigator.pushNamed(context, Routes.adminAnalyticsScreen);
               } else {
                 showReportBottomSheet(context);
               }
