@@ -10,7 +10,6 @@ import 'package:flutter_maps/helpers/notification_helper.dart';
 import 'package:flutter_maps/presentation/widgets/app_markers.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import '../mapCubit/map_cubit.dart';
@@ -59,39 +58,11 @@ class IssueCubit extends Cubit<IssueStates> {
     }
   }
 
-  // --- Crop Image ---
-  Future<void> cropImage(BuildContext context, File imageFile) async {
-    final croppedFile = await ImageCropper().cropImage(
-      sourcePath: imageFile.path,
-      uiSettings: [
-        AndroidUiSettings(
-          toolbarTitle: 'Crop Image',
-          toolbarColor: Colors.deepOrange,
-          toolbarWidgetColor: Colors.white,
-          initAspectRatio: CropAspectRatioPreset.original,
-          lockAspectRatio: false,
-          aspectRatioPresets: [
-            CropAspectRatioPreset.square,
-            CropAspectRatioPreset.ratio3x2,
-            CropAspectRatioPreset.original,
-            CropAspectRatioPreset.ratio4x3,
-            CropAspectRatioPreset.ratio16x9,
-          ],
-        ),
-        IOSUiSettings(
-          title: 'Crop Image',
-          aspectRatioLockEnabled: false,
-        ),
-      ],
-    );
-
-    if (croppedFile != null) {
-      this.imageFile = File(croppedFile.path);
-      emit(ImagePickerSuccessState());
-    } else {
-      emit(ImagePickerErrorState());
-    }
+void clearImage() {
+    imageFile = null;
+    emit(ImageClearedState());
   }
+
 
   // --- Fetch Current Location ---
   Future<void> fetchCurrentLocation() async {
@@ -178,7 +149,7 @@ class IssueCubit extends Cubit<IssueStates> {
 
     if (confirm != true) return;
 
-    emit(IssueSubmittingState());
+    emit(IssueSubmittingLoadingState());
 
     final locationLat = currentPosition!.latitude;
     final locationLng = currentPosition!.longitude;
