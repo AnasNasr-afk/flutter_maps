@@ -16,7 +16,7 @@ class LocationErrorState extends IssueStates {
   LocationErrorState(this.error);
 }
 
-class IssueSubmittingState extends IssueStates {}
+class IssueSubmittingLoadingState extends IssueStates {}
 class IssueSubmitSuccessState extends IssueStates {}
 class UserReportsLoadedState extends IssueStates {
   List<Map<String, dynamic>> users ;
@@ -50,5 +50,6 @@ class ResolvedImagePickerErrorState extends IssueStates {
   ResolvedImagePickerErrorState(this.error);
 }
 
+class ImageClearedState extends IssueStates {}
 
 

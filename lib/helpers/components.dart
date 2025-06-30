@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_maps/helpers/shared_pref_helper.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../business_logic/issueCubit/issue_cubit.dart';
@@ -85,7 +86,26 @@ void showPrivacyPolicyDialog(BuildContext context) {
         ),
   );
 }
+void showAppLoadingDialog(BuildContext context, {
+  Color color = Colors.blueAccent,
+  double? size,
+}) {
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (_) => Center(
+      child: LoadingAnimationWidget.inkDrop(
+        color: color,
+        size: size ?? 55.sp,
+      ),
+    ),
+  );
+}
 
+/// Closes the loading dialog if it's open.
+void hideAppLoadingDialog(BuildContext context) {
+  if (Navigator.canPop(context)) Navigator.of(context).pop();
+}
 void showReportBottomSheet(BuildContext context) {
   showModalBottomSheet(
     context: context,

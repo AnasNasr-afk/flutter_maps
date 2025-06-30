@@ -8,10 +8,12 @@ import 'package:uuid/uuid.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../business_logic/mapCubit/map_cubit.dart';
 import '../../business_logic/mapCubit/map_states.dart';
+import '../../helpers/color_manager.dart';
 import '../../helpers/components.dart';
 import '../../helpers/location_helper.dart';
 import '../../router/routes.dart';
 import '../widgets/build_drawer_item.dart';
+import '../widgets/glowing_fab.dart';
 import '../widgets/map_legend_window.dart';
 import '../widgets/map_search_bar.dart';
 import '../widgets/map_selected_location_listener.dart';
@@ -187,10 +189,8 @@ class _MapScreenState extends State<MapScreen> {
               ),
             );
           }
-
-          return FloatingActionButton(
-            heroTag: null,
-            backgroundColor: Colors.amber,
+          return GlowingFAB(
+            isAdmin: cubit.isAdmin,
             onPressed: () {
               if (cubit.isAdmin) {
                 Navigator.pushNamed(context, Routes.adminAnalyticsScreen);
@@ -198,12 +198,9 @@ class _MapScreenState extends State<MapScreen> {
                 showReportBottomSheet(context);
               }
             },
-            child: Icon(
-              cubit.isAdmin ? Icons.analytics_outlined : Icons.add,
-              color: Colors.black,
-              size: 30.sp,
-            ),
           );
+
+
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
