@@ -1,6 +1,5 @@
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,8 +11,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
 
-import '../../business_logic/issueCubit/issue_states.dart';
-import '../../helpers/color_manager.dart';
+import '../../../business_logic/issueCubit/issue_states.dart';
+import '../../../helpers/color_manager.dart';
 
 class ReportIssueBottomSheet extends StatefulWidget {
   const ReportIssueBottomSheet({super.key});
@@ -32,6 +31,31 @@ class _ReportIssueBottomSheetState extends State<ReportIssueBottomSheet> {
     super.dispose();
   }
 
+  final int maxChars = 100;
+  int charsLeft = 100;
+
+
+  @override
+  void initState() {
+    super.initState();
+    descriptionController.addListener(() {
+      final text = descriptionController.text;
+      if (text.length > maxChars) {
+        descriptionController.value = TextEditingValue(
+          text: text.substring(0, maxChars),
+          selection: TextSelection.collapsed(offset: maxChars),
+        );
+      }
+      setState(() {
+        charsLeft = maxChars - descriptionController.text.length;
+      });
+    });
+
+
+
+  }
+
+
   bool get isSubmitEnabled {
     final cubit = IssueCubit.get(context);
     return cubit.selectedCategory != null &&
@@ -49,7 +73,8 @@ class _ReportIssueBottomSheetState extends State<ReportIssueBottomSheet> {
       listener: (context, state) async {
         if (state is IssueSubmittingLoadingState) {
           showAppLoadingDialog(context);
-        } else if (state is IssueSubmitSuccessState) {
+        }
+        else if (state is IssueSubmitSuccessState) {
           if (Navigator.canPop(context)) {
             Navigator.pop(context); // Close loading dialog
           }
@@ -124,12 +149,14 @@ class _ReportIssueBottomSheetState extends State<ReportIssueBottomSheet> {
               ),
             ),
           );
-        } else if (state is IssueSubmitFailureState) {
+        }
+        else if (state is IssueSubmitFailureState) {
           if (Navigator.canPop(context)) Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Submission failed')),
           );
-        } else if (state is ImagePickerErrorState) {
+        }
+        else if (state is ImagePickerErrorState) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Image picker error')),
           );
@@ -137,9 +164,9 @@ class _ReportIssueBottomSheetState extends State<ReportIssueBottomSheet> {
       },
       child: DraggableScrollableSheet(
         expand: false,
-        initialChildSize: 0.48.h,
+        initialChildSize: 0.53.h,
         minChildSize: 0.3.h,
-        maxChildSize: 0.5.h,
+        maxChildSize: 0.8.h,
         builder: (context, scrollController) {
           return Container(
             decoration: BoxDecoration(
@@ -185,7 +212,6 @@ class _ReportIssueBottomSheetState extends State<ReportIssueBottomSheet> {
                       ),
                     ),
                     SizedBox(height: 20.h),
-
                     DropdownButtonFormField<String>(
                       dropdownColor: Colors.white,
                       decoration: InputDecoration(
@@ -198,12 +224,6 @@ class _ReportIssueBottomSheetState extends State<ReportIssueBottomSheet> {
                           borderSide: BorderSide(color: ColorManager.mainBlue, width: 0.4.w),
                           borderRadius: BorderRadius.circular(12.r),
                         ),
-                        // hintText: 'Select Category',
-                        // hintStyle: TextStyle(
-                        //   fontSize: 12.5.sp,
-                        //   color: Colors.grey[600],
-                        //   fontWeight: FontWeight.w400,
-                        // ),
                         labelText: 'Category',
                         labelStyle: TextStyle(
                           fontSize: 14.sp,
@@ -244,40 +264,62 @@ class _ReportIssueBottomSheetState extends State<ReportIssueBottomSheet> {
                       },
                     ),
                     SizedBox(height: 20.h),
-                    AppTextFormField(
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
-                      hintStyle: TextStyle(
-                        fontSize: 14.sp,
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.w400,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.grey, width: 0.3.w),
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: ColorManager.mainBlue, width: 0.4.w),
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      inputTextStyle: TextStyle(
-                        fontSize: 14.sp,
-                        color: Colors.black87,
-                        fontWeight: FontWeight.w400,
-                      ),
-                      controller: descriptionController,
-                      hintText: 'Describe the issue',
-                      onFieldSubmitted: (_) {
-                        FocusScope.of(context).unfocus(); // 👈 Hide keyboard
-                      },
-                      textInputAction: TextInputAction.done,
-                      maxLines: null,
-                      minLines: 1,
-                      keyboardType: TextInputType.multiline,
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return 'Please enter a valid description';
-                        }
-                        return null;
+                    ValueListenableBuilder<TextEditingValue>(
+                      valueListenable: descriptionController,
+                      builder: (context, value, _) {
+                        final charCount = value.text.length;
+                        final charsLeft = maxChars - charCount;
+
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            AppTextFormField(
+                              maxLength: maxChars, // Optional, shows counter inside field
+                              maxLines: 2,
+                              minLines: 2, // Fixed height for 2 lines
+                              controller: descriptionController,
+                              contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+                              hintStyle: TextStyle(
+                                fontSize: 14.sp,
+                                color: Colors.grey[600],
+                                fontWeight: FontWeight.w400,
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.grey, width: 0.3.w),
+                                borderRadius: BorderRadius.circular(12.r),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: ColorManager.mainBlue, width: 0.4.w),
+                                borderRadius: BorderRadius.circular(12.r),
+                              ),
+                              inputTextStyle: TextStyle(
+                                fontSize: 14.sp,
+                                color: Colors.black87,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              hintText: 'Provide a short description of the problem',
+                              keyboardType: TextInputType.multiline,
+                              textInputAction: TextInputAction.done,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Please enter a description';
+                                }
+                                if (value.trim().length > maxChars) {
+                                  return 'Please keep it under $maxChars characters';
+                                }
+                                return null;
+                              },
+                            ),
+                            SizedBox(height: 4.h),
+                            Text(
+                              "Words left: ${charsLeft < 0 ? 0 : charsLeft}",
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: charsLeft < 0 ? Colors.red : Colors.grey[600],
+                              ),
+                            ),
+                          ],
+                        );
                       },
                     ),
                     SizedBox(height: 20.h),
@@ -357,7 +399,6 @@ class _ReportIssueBottomSheetState extends State<ReportIssueBottomSheet> {
                                   ),
                                 ),
                               ),
-
                               SizedBox(height: 15.h),
                             ],
                           );

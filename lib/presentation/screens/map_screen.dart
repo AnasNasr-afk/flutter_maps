@@ -8,7 +8,6 @@ import 'package:uuid/uuid.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../business_logic/mapCubit/map_cubit.dart';
 import '../../business_logic/mapCubit/map_states.dart';
-import '../../helpers/color_manager.dart';
 import '../../helpers/components.dart';
 import '../../helpers/location_helper.dart';
 import '../../router/routes.dart';
@@ -76,6 +75,7 @@ class _MapScreenState extends State<MapScreen> {
               current is MapMarkerState || current is MapRouteState,
               builder: (context, state) {
                 return GoogleMap(
+
                   zoomControlsEnabled: false,
 
                   myLocationEnabled: true,

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 enum IssueStatus { pending, inProgress, resolved, rejected }
@@ -52,7 +53,9 @@ class IssueModel {
   final String image;
   final String userEmail;
   final IssueStatus status;
-  final String? adminResolutionImage; // Added for admin image
+  final String? adminResolutionImage;
+  DateTime? createdAt; // Added for created date
+  // Added for admin image
 
   IssueModel({
     required this.userName,
@@ -64,6 +67,7 @@ class IssueModel {
     required this.userEmail,
     required this.status,
     this.adminResolutionImage,
+    this.createdAt,
   });
 
   Map<String, dynamic> toJson() {
@@ -76,9 +80,12 @@ class IssueModel {
       'image': image,
       'userEmail': userEmail,
       'status': status.name,
-      if (adminResolutionImage != null) 'adminResolutionImage': adminResolutionImage,
+      if (adminResolutionImage != null)
+        'adminResolutionImage': adminResolutionImage,
+      'createdAt': createdAt,
     };
   }
+
 
   factory IssueModel.fromJson(Map<String, dynamic> json) {
     return IssueModel(
@@ -91,6 +98,10 @@ class IssueModel {
       userEmail: json['userEmail'],
       status: IssueStatusExtension.fromString(json['status']),
       adminResolutionImage: json['adminResolutionImage'],
+      createdAt: json['createdAt'] != null
+          ? (json['createdAt'] as Timestamp).toDate()
+          : null,
     );
   }
+
 }

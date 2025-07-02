@@ -38,14 +38,14 @@ void main() async {
   String? token;
   if (Platform.isAndroid) {
     token = await FirebaseMessaging.instance.getToken();
-    print('📱 Android FCM Token: $token');
+    debugPrint('📱 Android FCM Token: $token');
   } else if (Platform.isIOS) {
     await Future.delayed(const Duration(seconds: 3)); // Small wait for APNs
     final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
 
     if (apnsToken != null) {
       token = await FirebaseMessaging.instance.getToken();
-      print('🍎 iOS FCM Token: $token');
+      debugPrint('🍎 iOS FCM Token: $token');
     } else {
       ('⚠️ iOS APNs token not yet set');
     }

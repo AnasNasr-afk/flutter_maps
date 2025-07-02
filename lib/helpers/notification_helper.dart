@@ -11,7 +11,7 @@ class NotificationHelper {
 
   static Future<String> getAccessToken() async {
     try {
-      print('🔐 Starting token generation...');
+      debugPrint('🔐 Starting token generation...');
       final serviceAccountJson ={
         "type": "service_account",
         "project_id": "flutter-maps-44621",
@@ -36,11 +36,11 @@ class NotificationHelper {
       final client = await auth.clientViaServiceAccount(credentials, scopes);
       final token = client.credentials.accessToken.data;
 
-      print('✅ Access token generated');
+      debugPrint('✅ Access token generated');
       client.close();
       return token;
     } catch (e) {
-      print('❌ Failed to generate access token: $e');
+      debugPrint('❌ Failed to generate access token: $e');
       rethrow;
     }
   }
@@ -48,9 +48,9 @@ class NotificationHelper {
   static Future<void> sendNotification(
       String title, String body, String deviceToken) async {
     try {
-      print('📲 Preparing to send notification...');
+      debugPrint('📲 Preparing to send notification...');
       final accessToken = await getAccessToken();
-      print('📦 FCM Token used: $deviceToken');
+      debugPrint('📦 FCM Token used: $deviceToken');
 
       final message = {
         "message": {
@@ -65,7 +65,7 @@ class NotificationHelper {
         }
       };
 
-      print('📤 Sending request to FCM...');
+      debugPrint('📤 Sending request to FCM...');
       final response = await http.post(
         _url,
         headers: {
@@ -75,16 +75,16 @@ class NotificationHelper {
         body: jsonEncode(message),
       );
 
-      print('📥 FCM Response: ${response.statusCode}');
-      print('🧾 Response Body: ${response.body}');
+      debugPrint('📥 FCM Response: ${response.statusCode}');
+      debugPrint('🧾 Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
-        print('✅ Notification sent successfully');
+        debugPrint('✅ Notification sent successfully');
       } else {
-        print('❌ Failed to send notification');
+        debugPrint('❌ Failed to send notification');
       }
     } catch (e) {
-      print('❌ Error sending notification: $e');
+      debugPrint('❌ Error sending notification: $e');
     }
   }
 

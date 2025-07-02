@@ -36,7 +36,6 @@ class LoginCubit extends Cubit<LoginStates> {
       );
 
       final uid = credential.user?.uid;
-      final username = credential.user?.displayName ?? 'User';
 
       if (uid != null) {
         // 🔐 Store UID in local storage
