@@ -8,6 +8,7 @@ class Routes {
   static const String changePasswordScreen = '/changePasswordScreen';
   static const String deleteAccountScreen = '/deleteAccountScreen';
   static const String adminAnalyticsScreen = '/adminAnalyticsScreen';
+  static const String sideBySideScreenshotsPreview = '/sideBySideScreenshotsPreview';
 
 
 

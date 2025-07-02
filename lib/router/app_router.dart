@@ -8,6 +8,7 @@ import 'package:flutter_maps/presentation/screens/login/loginCubit/login_cubit.d
 import 'package:flutter_maps/presentation/screens/map_screen.dart';
 import 'package:flutter_maps/presentation/screens/notifications_screen.dart';
 import 'package:flutter_maps/presentation/screens/signUp/signupCubit/signup_cubit.dart';
+import 'package:flutter_maps/presentation/screens/side_by_side_screenshots_preview.dart';
 import 'package:flutter_maps/router/routes.dart';
 
 import '../business_logic/userReportsCubit/user_reports_cubit.dart';
@@ -55,6 +56,9 @@ class AppRouter {
             builder: (_) => BlocProvider(
                 create: (context) => UserSecurityCubit(),
                 child: const ChangePasswordScreen()));
+      case Routes.sideBySideScreenshotsPreview:
+        return MaterialPageRoute(
+            builder: (_) => const SideBySideScreenshotsPreview());
     }
     return null;
   }
