@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_maps/business_logic/mapCubit/map_states.dart';
 import 'package:flutter_maps/data/repository/maps_repo.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -12,11 +11,9 @@ import 'package:material_floating_search_bar_2/material_floating_search_bar_2.da
 
 import '../../data/models/place_suggestion_model.dart';
 import '../../helpers/admin_services.dart';
-import '../../helpers/location_helper.dart';
-import '../../presentation/widgets/admin_issue_bottom_sheet.dart';
+import '../../presentation/widgets/adminIssueBottomSheet/admin_issue_bottom_sheet.dart';
 import '../../presentation/widgets/app_markers.dart';
 import '../issueCubit/issue_cubit.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 
 class MapCubit extends Cubit<MapStates> {
   final MapsRepo mapsRepo;
@@ -162,6 +159,7 @@ class MapCubit extends Cubit<MapStates> {
                       child: BlocProvider(
                         create: (_) => IssueCubit(),
                         child: AdminIssueBottomSheet(
+                          location: data['location'] ?? '',
                           category: category,
                           description: description,
                           imagePath: data['image'] ?? '',
@@ -170,20 +168,9 @@ class MapCubit extends Cubit<MapStates> {
                           status: status,
                           docId: doc.id,
                           adminResolvedImage: data['adminResolvedImage'] ?? '',
-                          onGetDirections: () {
-                            Navigator.pop(_mapContext);
-                            final latLng = LocationHelper.extractLatLngFromString(data['location']);
-                            if (latLng != null) {
-                              Future.delayed(const Duration(milliseconds: 300), () {
-                                _mapContext.read<MapCubit>().drawRouteToIssue(
-                                  latLng.latitude,
-                                  latLng.longitude,
-                                );
-                              });
-                            } else {
-                              debugPrint('❌ Invalid location string: ${data['location']}');
-                            }
-                          },
+                          createdAt: data['createdAt'] != null
+                              ? (data['createdAt'] as Timestamp).toDate()
+                              : DateTime.now(),
                         ),
                       ),
                     );
@@ -230,48 +217,4 @@ class MapCubit extends Cubit<MapStates> {
 
 
 
-  Future<void> drawRouteToIssue(double destLat, double destLng) async {
-    debugPrint('🧭 drawRouteToIssue START: $destLat, $destLng');
-
-    final origin = await LocationHelper.getCurrentLocation();
-
-    debugPrint('📍 Origin: ${origin.latitude}, ${origin.longitude}');
-
-    final polylinePoints = PolylinePoints();
-    final result = await polylinePoints.getRouteBetweenCoordinates(
-      googleApiKey: dotenv.env['GOOGLE_API_KEY']!,
-      request: PolylineRequest(
-        origin: PointLatLng(origin.latitude, origin.longitude),
-        destination: PointLatLng(destLat, destLng),
-        mode: TravelMode.driving,
-      ),
-    );
-
-    debugPrint('📈 Fetched ${result.points.length} polyline points');
-
-
-    if (result.points.isEmpty) {
-      debugPrint('❌ No route found');
-      emit(MapRouteErrorState('No route found'));
-      return;
-    }
-
-    final polylineCoordinates = result.points
-        .map((point) => LatLng(point.latitude, point.longitude))
-        .toList();
-
-    final polyline = Polyline(
-      polylineId: const PolylineId('route'),
-      color: Colors.blue,
-      width: 5,
-      points: polylineCoordinates,
-    );
-
-    debugPrint('✅ Emitting MapRouteState with ${polyline.points.length} points');
-
-    emit(MapRouteState(
-      polyline: polyline,
-      cameraTarget: LatLng(destLat, destLng),
-    ));
-  }
 }

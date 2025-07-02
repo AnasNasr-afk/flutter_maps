@@ -20,6 +20,7 @@ class AppTextFormField extends StatelessWidget {
   final bool? enabled;
   final int? maxLines;
   final int? minLines;
+  final String? helperText;
   final TextInputAction? textInputAction;
   final TextEditingController? controller;
   final TextInputType? textInputType;
@@ -27,6 +28,7 @@ class AppTextFormField extends StatelessWidget {
   final ValueChanged<String>? onFieldSubmitted;
   final ValueChanged<String>? onChanged;
   final Function(String?) validator;
+  final int? maxLength;
 
   const AppTextFormField({super.key,
     this.contentPadding,
@@ -49,6 +51,8 @@ class AppTextFormField extends StatelessWidget {
     this.keyboardType,
     this.minLines,
     this.textInputAction,
+    this.helperText,
+    this.maxLength,
   });
 
   @override

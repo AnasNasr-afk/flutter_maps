@@ -204,7 +204,8 @@ void clearImage() {
         image: imageValue,
         userEmail: currentUser.email,
         status: IssueStatus.pending,
-      );
+        createdAt: DateTime.now(),
+    );
 
       await FirebaseFirestore.instance.collection('issues').add(issue.toJson());
 
