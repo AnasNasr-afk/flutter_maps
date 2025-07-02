@@ -4,8 +4,23 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class AdminAnalyticsScreen extends StatelessWidget {
+import '../../helpers/color_manager.dart';
+
+class AdminAnalyticsScreen extends StatefulWidget {
   const AdminAnalyticsScreen({super.key});
+
+  @override
+  State<AdminAnalyticsScreen> createState() => _AdminAnalyticsScreenState();
+}
+
+class _AdminAnalyticsScreenState extends State<AdminAnalyticsScreen> {
+  late Future<Map<String, dynamic>> _statsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _statsFuture = _fetchStats();
+  }
 
   Future<Map<String, dynamic>> _fetchStats() async {
     final snapshot = await FirebaseFirestore.instance.collection('issues').get();
@@ -28,6 +43,12 @@ class AdminAnalyticsScreen extends StatelessWidget {
     };
   }
 
+  Future<void> _refreshData() async {
+    setState(() {
+      _statsFuture = _fetchStats();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,7 +58,7 @@ class AdminAnalyticsScreen extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              colors: [Colors.amber, Colors.orange],
+              colors: [ColorManager.gradientStart, ColorManager.gradientEnd],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -49,16 +70,21 @@ class AdminAnalyticsScreen extends StatelessWidget {
           child: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
-            title: Text(
-              '📊 Admin Analytics',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.sp),
-            ),
             centerTitle: true,
+            title: Text(
+              'Admin Analytics',
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 22.sp,
+                color: Colors.white,
+                letterSpacing: 0.5,
+              ),
+            ),
           ),
         ),
       ),
       body: FutureBuilder<Map<String, dynamic>>(
-        future: _fetchStats(),
+        future: _statsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -69,17 +95,23 @@ class AdminAnalyticsScreen extends StatelessWidget {
           final categoryCounts = data['categoryCounts'] as Map<String, int>;
           final total = data['total'] ?? 0;
 
-          return SingleChildScrollView(
-            padding: EdgeInsets.all(16.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildOverviewCard(total, statusCounts),
-                SizedBox(height: 20.h),
-                _buildChartCard('Issue Status Overview', statusCounts, Colors.deepPurple),
-                SizedBox(height: 24.h),
-                _buildChartCard('Issue Categories', categoryCounts, Colors.teal),
-              ],
+          return RefreshIndicator(
+            backgroundColor: Colors.white,
+            color: ColorManager.mainBlue,
+            onRefresh: _refreshData,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: EdgeInsets.all(16.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildOverviewCard(total, statusCounts),
+                  SizedBox(height: 20.h),
+                  _buildChartCard('Issue Status Overview', statusCounts, Colors.deepPurple),
+                  SizedBox(height: 24.h),
+                  _buildChartCard('Issue Categories', categoryCounts, Colors.teal),
+                ],
+              ),
             ),
           );
         },
@@ -91,6 +123,7 @@ class AdminAnalyticsScreen extends StatelessWidget {
     final pending = statusCounts['pending'] ?? 0;
     final inProgress = statusCounts['inProgress'] ?? 0;
     final resolved = statusCounts['resolved'] ?? 0;
+    final rejected = statusCounts['rejected'] ?? 0;
 
     return Container(
       padding: EdgeInsets.all(16.w),
@@ -100,35 +133,57 @@ class AdminAnalyticsScreen extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: Colors.black12,
-            blurRadius: 6.r,
+            blurRadius: 8.r,
             offset: Offset(0, 4.h),
           ),
         ],
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildStatRow('Total Issues', total, Colors.orange),
-          Divider(thickness: 1.h),
-          _buildStatRow('Pending', pending, Colors.redAccent),
-          _buildStatRow('In Progress', inProgress, Colors.amber),
-          _buildStatRow('Resolved', resolved, Colors.green),
+          Center(
+            child: Text(
+              'Total Issues: $total',
+              style: TextStyle(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+          ),
+          SizedBox(height: 16.h),
+          _buildStatusRow('Pending', pending, Colors.orange),
+          _buildStatusRow('In Progress', inProgress, Colors.blue),
+          _buildStatusRow('Resolved', resolved, Colors.green),
+          _buildStatusRow('Rejected', rejected, Colors.red),
         ],
       ),
     );
   }
 
-  Widget _buildStatRow(String label, int count, Color color) {
+  Widget _buildStatusRow(String label, int count, Color color) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 6.h),
       child: Row(
         children: [
-          Icon(Icons.circle, size: 12.sp, color: color),
-          SizedBox(width: 8.w),
-          Text(label, style: TextStyle(fontSize: 14.sp)),
-          const Spacer(),
+          Container(
+            width: 12.w,
+            height: 12.w,
+            margin: EdgeInsets.only(right: 10.w),
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+            ),
+          ),
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(fontSize: 14.sp),
+            ),
+          ),
           Text(
             count.toString(),
-            style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
           ),
         ],
       ),
@@ -141,10 +196,11 @@ class AdminAnalyticsScreen extends StatelessWidget {
     final maxY = (values.isEmpty ? 0 : values.reduce(max)) + 1;
 
     return Container(
-      padding: EdgeInsets.all(12.w),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      margin: EdgeInsets.only(bottom: 16.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
             color: Colors.black12,
@@ -156,7 +212,10 @@ class AdminAnalyticsScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
+          Text(
+            title,
+            style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold, color: barColor),
+          ),
           SizedBox(height: 12.h),
           SizedBox(
             height: 220.h,
@@ -171,8 +230,16 @@ class AdminAnalyticsScreen extends StatelessWidget {
                       BarChartRodData(
                         toY: dataMap[keys[i]]!.toDouble(),
                         color: barColor,
-                        width: 14.w,
-                        borderRadius: BorderRadius.circular(4.r),
+                        width: 18.w,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(6.r),
+                          topRight: Radius.circular(6.r),
+                        ),
+                        backDrawRodData: BackgroundBarChartRodData(
+                          show: true,
+                          toY: maxY.toDouble(),
+                          color: Colors.grey.shade200,
+                        ),
                       ),
                     ],
                   ),
@@ -183,19 +250,14 @@ class AdminAnalyticsScreen extends StatelessWidget {
                   leftTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
-                      reservedSize: 30.w,
-                      getTitlesWidget: (value, _) {
-                        if (value % 1 == 0) {
-                          return Padding(
-                            padding: EdgeInsets.only(right: 4.w),
-                            child: Text(
-                              value.toInt().toString(),
-                              style: TextStyle(fontSize: 10.sp),
-                            ),
-                          );
-                        }
-                        return const SizedBox.shrink();
-                      },
+                      reservedSize: 28.w,
+                      getTitlesWidget: (value, _) => Padding(
+                        padding: EdgeInsets.only(right: 6.w),
+                        child: Text(
+                          value.toInt().toString(),
+                          style: TextStyle(fontSize: 10.sp, color: Colors.grey[700]),
+                        ),
+                      ),
                     ),
                   ),
                   bottomTitles: AxisTitles(
@@ -206,13 +268,10 @@ class AdminAnalyticsScreen extends StatelessWidget {
                         if (index < keys.length) {
                           return Padding(
                             padding: EdgeInsets.only(top: 6.h),
-                            child: Transform.rotate(
-                              angle: -0.5,
-                              child: Text(
-                                keys[index],
-                                style: TextStyle(fontSize: 10.sp),
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                            child: Text(
+                              keys[index],
+                              style: TextStyle(fontSize: 10.sp),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           );
                         }
@@ -221,15 +280,7 @@ class AdminAnalyticsScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-
-                gridData: FlGridData(
-                  show: true,
-                  drawHorizontalLine: true,
-                  getDrawingHorizontalLine: (value) => FlLine(
-                    color: Colors.grey.shade300,
-                    strokeWidth: 0.5.w,
-                  ),
-                ),
+                gridData: FlGridData(show: false),
                 borderData: FlBorderData(show: false),
               ),
             ),
