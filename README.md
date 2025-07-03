@@ -44,7 +44,7 @@ A focused, community-driven Flutter app enabling citizens to report urban issues
 ---
 
 ## 📲 Screenshots
-<img src="assets/screenshots/mapScreenshot.png" alt="Home Screen" width="300"/>   <img src="assets/screenshots/reportIssueScreenshot.png" alt="Report Issue" width="300"/>   <img src="assets/screenshots/adminViewScreenshot.png" alt="Admin View" width="300"/>
+<img src="assets/screenshots/mapScreenshot.png" alt="Home Screen" width="300"/>  <img src="assets/screenshots/reportIssueScreenshot.png" alt="Report Issue" width="300"/> <img src="assets/screenshots/adminViewScreenshot.png" alt="Admin View" width="300"/>
 
 
 ---
