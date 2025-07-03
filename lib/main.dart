@@ -19,28 +19,18 @@ import 'dart:io';
 
 
 void main() async {
-  // 🔧 Required for any async work before runApp
+
   WidgetsFlutterBinding.ensureInitialized();
-
-  // 📦 Load .env file if needed
   await dotenv.load(fileName: ".env");
-
-  // 🔥 Initialize Firebase
   await Firebase.initializeApp();
-
-  // 🎯 Set up background FCM handler
   FirebaseMessaging.onBackgroundMessage(MessageConfig.firebaseMessagingBackgroundHandler);
-
-  // 🔔 Setup FCM and local notifications
   await MessageConfig.initFirebaseMessaging();
-
-  // 📱 Get FCM token safely for iOS/Android
   String? token;
   if (Platform.isAndroid) {
     token = await FirebaseMessaging.instance.getToken();
     debugPrint('📱 Android FCM Token: $token');
   } else if (Platform.isIOS) {
-    await Future.delayed(const Duration(seconds: 3)); // Small wait for APNs
+    await Future.delayed(const Duration(seconds: 3));
     final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
 
     if (apnsToken != null) {
@@ -50,8 +40,6 @@ void main() async {
       ('⚠️ iOS APNs token not yet set');
     }
   }
-
-  // 🧠 Check if user is already logged in
   final String userToken = await SharedPrefHelper.getString(userId);
   final bool isLoggedIn = userToken.isNotEmpty;
 

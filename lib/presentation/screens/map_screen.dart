@@ -8,6 +8,7 @@ import 'package:uuid/uuid.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../business_logic/mapCubit/map_cubit.dart';
 import '../../business_logic/mapCubit/map_states.dart';
+import '../../helpers/color_manager.dart';
 import '../../helpers/components.dart';
 import '../../helpers/location_helper.dart';
 import '../../router/routes.dart';
@@ -164,7 +165,6 @@ class _MapScreenState extends State<MapScreen> {
         ],
       ),
 
-      /// FAB
       floatingActionButton: BlocBuilder<MapCubit, MapStates>(
         builder: (context, state) {
           if (!cubit.isAdminChecked) {
@@ -205,113 +205,108 @@ class _MapScreenState extends State<MapScreen> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
 
-      /// Drawer
-      drawer: Drawer(
+       drawer: Drawer(
+          backgroundColor: Colors.white,
+          child: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 24.h),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [ColorManager.gradientStart, ColorManager.gradientEnd],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 8.r,
+                        offset: Offset(0, 3.h),
+                      ),
+                    ],
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(20.r),
+                      bottomRight: Radius.circular(20.r),
+                    ),
+                  ),
+                  child: Row(
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                (FirebaseAuth.instance.currentUser?.displayName?.split(' ').first ?? 'User'),
+                                style: TextStyle(
+                                  fontSize: 25.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              SizedBox(height: 6.h),
+                              Text(
+                                FirebaseAuth.instance.currentUser?.email ?? 'No email found',
+                                style: TextStyle(
+                                  fontSize: 15.sp,
+                                  color: Colors.white70,
+                                ),
+                              ),
+                            ],
+                          ),
 
-        backgroundColor: Colors.white,
-        child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(
-                padding: EdgeInsets.all(16.w),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Colors.amber, Colors.orange],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black26,
-                      blurRadius: 8.r,
-                      offset: Offset(0, 3.h),
-                    ),
-                  ],
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(20.r),
-                    bottomRight: Radius.circular(20.r),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      FirebaseAuth.instance.currentUser?.displayName ?? 'User',
-                      style: TextStyle(
-                        fontSize: 20.sp,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                        ],
                       ),
-                    ),
-                    Text(
-                      FirebaseAuth.instance.currentUser?.email ?? 'No email found',
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        color: Colors.black54,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 20.h),
-              BuildDrawerItem(
-                icon: Icons.report_problem_outlined,
-                title: 'Reported Issues',
-                onTap: () {
-                  Navigator.popAndPushNamed(context, Routes.userReportsScreen);
-                },
-              ),
-              BuildDrawerItem(
-                icon: Icons.notifications_active_outlined,
-                title: 'Notifications',
-                onTap: () {
-                  Navigator.popAndPushNamed(context, Routes.notificationsScreen);
-                },
-              ),
-              BuildDrawerItem(
-                icon: Icons.support_agent,
-                title: 'Call Support',
-                onTap: () => callSupport(context),
-              ),
-              BuildDrawerItem(
-                icon: Icons.lock_outline,
-                title: 'Change Password',
-                onTap: () {
-                  Navigator.popAndPushNamed(context, Routes.changePasswordScreen);
-                },
-              ),
-              BuildDrawerItem(
-                icon: Icons.info_outline,
-                title: 'About App',
-                onTap: () => showModernAboutDialog(context),
-              ),
-              const Spacer(),
-              const Divider(),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-                child: ElevatedButton.icon(
-                  onPressed: () => logOut(context),
-                  icon: Icon(Icons.logout, color: Colors.white, size: 20.sp),
-                  label: Text(
-                    'Logout',
-                    style: TextStyle(fontSize: 16.sp),
+
                   ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.redAccent,
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(vertical: 14.h),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                    elevation: 4.h,
-                  ),
+                SizedBox(height: 24.h),
+                BuildDrawerItem(
+                  icon: Icons.report_problem_outlined,
+                  title: 'Reported Issues',
+                  onTap: () => Navigator.popAndPushNamed(context, Routes.userReportsScreen),
                 ),
-              ),
-            ],
+                Divider(height: 32.h, thickness: 1, indent: 16.w, endIndent: 16.w, color: Colors.grey.shade300),
+                BuildDrawerItem(
+                  icon: Icons.edit_outlined,
+                  title: 'Edit Profile',
+                  onTap: () => Navigator.popAndPushNamed(context, Routes.editProfileScreen),
+                ),
+                Divider(height: 32.h, thickness: 1, indent: 16.w, endIndent: 16.w, color: Colors.grey.shade300),
+                BuildDrawerItem(
+                  icon: Icons.notifications_active_outlined,
+                  title: 'Notifications',
+                  onTap: () => Navigator.popAndPushNamed(context, Routes.notificationsScreen),
+                ),
+                Divider(height: 32.h, thickness: 1, indent: 16.w, endIndent: 16.w, color: Colors.grey.shade300),
+                BuildDrawerItem(
+                  icon: Icons.support_agent,
+                  title: 'Call Support',
+                  onTap: () => callSupport(context),
+                ),
+                Divider(height: 32.h, thickness: 1, indent: 16.w, endIndent: 16.w, color: Colors.grey.shade300),
+                BuildDrawerItem(
+                  icon: Icons.lock_outline,
+                  title: 'Change Password',
+                  onTap: () => Navigator.popAndPushNamed(context, Routes.changePasswordScreen),
+                ),
+                Divider(height: 32.h, thickness: 1, indent: 16.w, endIndent: 16.w, color: Colors.grey.shade300),
+                BuildDrawerItem(
+                  icon: Icons.info_outline,
+                  title: 'About App',
+                  onTap: () => showModernAboutDialog(context),
+                ),
+                Divider(height: 32.h, thickness: 1, indent: 16.w, endIndent: 16.w, color: Colors.grey.shade300),
+                BuildDrawerItem(
+                  icon: Icons.logout,
+                  title: 'Logout',
+                  onTap: () => logOut(context),
+                ),
+
+              ],
+            ),
           ),
         ),
-      ),
+
     );
   }
 }
