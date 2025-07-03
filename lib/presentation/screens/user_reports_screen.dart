@@ -2,11 +2,15 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_maps/helpers/components.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../business_logic/userReportsCubit/user_reports_cubit.dart';
 import '../../business_logic/userReportsCubit/user_reports_states.dart';
+import '../../business_logic/mapCubit/map_cubit.dart';
 import '../../data/models/issue_model.dart';
-import '../../business_logic/mapCubit/map_cubit.dart'; // <-- import your MapCubit
+import '../../helpers/color_manager.dart';
 
 class UserReportsScreen extends StatefulWidget {
   const UserReportsScreen({super.key});
@@ -25,11 +29,6 @@ class _UserReportsScreenState extends State<UserReportsScreen> {
       context.read<UserReportsCubit>().initializeReports(user!.uid);
     }
   }
-  // @override
-  // void dispose() {
-  //   context.read<MapCubit>().refreshMarkers();
-  //   super.dispose();
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -40,21 +39,22 @@ class _UserReportsScreenState extends State<UserReportsScreen> {
         child: Container(
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              colors: [Colors.amber, Colors.orange],
+              colors: [ColorManager.gradientStart, ColorManager.gradientEnd],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(20.r),
-              bottomRight: Radius.circular(20.r),
-            ),
+            borderRadius: BorderRadius.vertical(bottom: Radius.circular(20.r)),
           ),
           child: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
             title: Text(
               'Reported Issues',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.sp),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20.sp,
+                color: Colors.white,
+              ),
             ),
             centerTitle: true,
           ),
@@ -63,7 +63,7 @@ class _UserReportsScreenState extends State<UserReportsScreen> {
       body: BlocBuilder<UserReportsCubit, UserReportsStates>(
         builder: (context, state) {
           if (state is UserReportsLoadingState || state is UserReportsInitialState) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator(color: Colors.blue,));
           }
           if (state is UserReportsErrorState) {
             return Center(child: Text(state.message ?? 'Failed to load reports.'));
@@ -71,6 +71,7 @@ class _UserReportsScreenState extends State<UserReportsScreen> {
           if (state is UserReportsLoadedState) {
             final issues = state.issues;
             final isAdmin = state.isAdmin;
+
             return RefreshIndicator(
               onRefresh: () async {
                 if (user != null) {
@@ -87,98 +88,142 @@ class _UserReportsScreenState extends State<UserReportsScreen> {
                   itemBuilder: (context, index) {
                     final issue = issues[index];
                     final status = issue['status'] ?? 'pending';
-                    return Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18.r),
+
+                    /// Time Handling
+                    final rawTimestamp = issue['timestamp'];
+                    DateTime? createdAt;
+                    if (rawTimestamp is Timestamp) {
+                      createdAt = rawTimestamp.toDate();
+                    } else if (rawTimestamp is String) {
+                      try {
+                        createdAt = DateTime.parse(rawTimestamp);
+                      } catch (_) {}
+                    }
+
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16.r),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 6,
+                            offset: Offset(0, 3),
+                          ),
+                        ],
                       ),
-                      elevation: 4,
-                      color: Colors.white,
-                      child: Padding(
-                        padding: EdgeInsets.all(16.r),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                buildSectionHeader('Category'),
-                                const Spacer(),
-                                buildStatusPill(status),
-                              ],
-                            ),
-                            SizedBox(height: 6.h),
-                            Text(issue['category'] ?? 'Unknown', style: TextStyle(fontSize: 15.sp)),
-                            SizedBox(height: 16.h),
-                            buildSectionHeader('Description'),
-                            SizedBox(height: 6.h),
-                            Text(
-                              (issue['description']?.toString().trim().isNotEmpty ?? false)
-                                  ? issue['description']
-                                  : 'No description provided.',
-                              style: TextStyle(fontSize: 14.sp, height: 1.4.h),
-                            ),
-                            SizedBox(height: 16.h),
-                            buildSectionHeader('Attached Image'),
-                            SizedBox(height: 6.h),
-                            buildIssueImage(context, issue['image']?.toString()),
-                            if (issue['adminResolvedImage'] != null && issue['adminResolvedImage'].toString().isNotEmpty) ...[
-                              SizedBox(height: 16.h),
-                              buildSectionHeader('Resolved Image'),
-                              SizedBox(height: 6.h),
-                              buildIssueImage(context, issue['adminResolvedImage']?.toString()),
+                      padding: EdgeInsets.all(16.r),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          /// Header
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  issue['category'] ?? 'Unknown',
+                                  style: TextStyle(
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              buildStatusPill(status),
                             ],
-                            SizedBox(height: 16.h),
-                            buildSectionHeader('Submitted By'),
-                            SizedBox(height: 6.h),
-                            Text('Name: ${issue['userName'] ?? 'Unknown'}'),
-                            Text('Email: ${issue['userEmail'] ?? 'Unknown'}'),
-                            if (isAdmin) ...[
-                              SizedBox(height: 16.h),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.delete, color: Colors.red),
-                                    onPressed: () async {
-                                      // Show confirm dialog before deleting
-                                      final confirmed = await showDialog<bool>(
-                                        context: context,
-                                        builder: (context) => AlertDialog(
-                                          backgroundColor: Colors.white,
-                                          title: const Text('Confirm Deletion'),
-                                          content: const Text('Are you sure you want to delete this issue? This action cannot be undone.'),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () => Navigator.of(context).pop(false),
-                                              child: const Text('Cancel' , style: TextStyle(color: Colors.grey),),
-                                            ),
-                                            ElevatedButton(
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: Colors.red,
-                                              ),
-                                              onPressed: ()  {
-                                                Navigator.of(context).pop(true);
-                                              },
-                                              child: const Text('Delete' , style: TextStyle(color: Colors.white)),
-                                            ),
-                                          ],
+                          ),
+                          SizedBox(height: 4.h),
+                          if (createdAt != null)
+                            Text(
+                              'Reported ${formatDate(createdAt)}',
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          SizedBox(height: 12.h),
+
+                          /// Description
+                          Text(
+                            issue['description']?.toString().trim().isNotEmpty ?? false
+                                ? issue['description']
+                                : 'No description provided.',
+                            style: TextStyle(fontSize: 14.sp, height: 1.4),
+                          ),
+
+                          /// Image Before
+                          if (issue['image'] != null && issue['image'].toString().isNotEmpty)
+                            ...[
+                              SizedBox(height: 12.h),
+                              Text('Attached Image', style: _sectionHeaderStyle()),
+                              SizedBox(height: 8.h),
+                              buildIssueImage(context, issue['image']),
+                            ],
+
+                          /// Image After
+                          if (issue['adminResolvedImage'] != null &&
+                              issue['adminResolvedImage'].toString().isNotEmpty)
+                            ...[
+                              SizedBox(height: 12.h),
+                              Text('Resolved Image', style: _sectionHeaderStyle()),
+                              SizedBox(height: 8.h),
+                              buildIssueImage(context, issue['adminResolvedImage']),
+                            ],
+
+                          /// User info
+                          SizedBox(height: 12.h),
+                          Text('Submitted by', style: _sectionHeaderStyle()),
+                          SizedBox(height: 4.h),
+                          Text(
+                            issue['userName'] ?? 'Unknown',
+                            style: TextStyle(fontSize: 13.sp, color: Colors.black87),
+                          ),
+                          Text(
+                            issue['userEmail'] ?? 'Unknown',
+                            style: TextStyle(fontSize: 13.sp, color: Colors.grey[700]),
+                          ),
+
+                          /// Admin Controls
+                          if (isAdmin) ...[
+                            SizedBox(height: 12.h),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: IconButton(
+                                icon: const Icon(Icons.delete, color: Colors.red),
+                                onPressed: () async {
+                                  final confirmed = await showDialog<bool>(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: const Text('Confirm Deletion'),
+                                      content: const Text(
+                                          'Are you sure you want to delete this issue?'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(context, false),
+                                          child: const Text('Cancel'),
                                         ),
-                                      );
-                                      if (confirmed == true) {
-                                        await context.read<UserReportsCubit>().deleteIssue(
-                                          issue['id'],
-                                          user!.uid,
-                                          isAdmin,
-                                        );
-                                        // Update map markers after deletion
-                                        context.read<MapCubit>().refreshMarkers();
-                                      }
-                                    },
-                                  )
-                                ],
-                              )
-                            ]
-                          ],
-                        ),
+                                        ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.red,
+                                          ),
+                                          onPressed: () => Navigator.pop(context, true),
+                                          child: const Text('Delete'),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                  if (confirmed == true) {
+                                    await context.read<UserReportsCubit>().deleteIssue(
+                                      issue['id'],
+                                      user!.uid,
+                                      isAdmin,
+                                    );
+                                    context.read<MapCubit>().refreshMarkers();
+                                  }
+                                },
+                              ),
+                            )
+                          ]
+                        ],
                       ),
                     );
                   },
@@ -186,19 +231,8 @@ class _UserReportsScreenState extends State<UserReportsScreen> {
               ),
             );
           }
-          return const SizedBox(); // fallback
+          return const SizedBox();
         },
-      ),
-    );
-  }
-
-  Widget buildSectionHeader(String title) {
-    return Text(
-      title,
-      style: TextStyle(
-        fontSize: 15.sp,
-        fontWeight: FontWeight.w600,
-        color: Colors.black87,
       ),
     );
   }
@@ -223,10 +257,7 @@ class _UserReportsScreenState extends State<UserReportsScreen> {
 
   Widget buildIssueImage(BuildContext context, String? image) {
     if (image == null || image.isEmpty) {
-      return const Text(
-        'No image available',
-        style: TextStyle(color: Colors.grey),
-      );
+      return const Text('No image available', style: TextStyle(color: Colors.grey));
     }
 
     Widget imageWidget;
@@ -234,24 +265,16 @@ class _UserReportsScreenState extends State<UserReportsScreen> {
       final bytes = base64Decode(image);
       imageWidget = Image.memory(
         bytes,
-        height: 200.h,
-        width: double.infinity.w,
+        height: 180.h,
+        width: double.infinity,
         fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => const Text(
-          'Failed to load image',
-          style: TextStyle(color: Colors.red),
-        ),
       );
-    } catch (e) {
+    } catch (_) {
       imageWidget = Image.network(
         image,
-        height: 200.h,
-        width: double.infinity.w,
+        height: 180.h,
+        width: double.infinity,
         fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => const Text(
-          'Failed to load image',
-          style: TextStyle(color: Colors.red),
-        ),
       );
     }
 
@@ -261,9 +284,8 @@ class _UserReportsScreenState extends State<UserReportsScreen> {
           context: context,
           builder: (_) => Dialog(
             backgroundColor: Colors.transparent,
-            insetPadding: EdgeInsets.all(12.w),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(6.r),
+              borderRadius: BorderRadius.circular(12.r),
               child: imageWidget,
             ),
           ),
@@ -275,4 +297,17 @@ class _UserReportsScreenState extends State<UserReportsScreen> {
       ),
     );
   }
+
+  String formatDate(DateTime time) {
+    return '${time.day.toString().padLeft(2, '0')}/'
+        '${time.month.toString().padLeft(2, '0')}/'
+        '${time.year} ${time.hour.toString().padLeft(2, '0')}:'
+        '${time.minute.toString().padLeft(2, '0')}';
+  }
+
+  TextStyle _sectionHeaderStyle() => TextStyle(
+    fontSize: 14.sp,
+    fontWeight: FontWeight.w600,
+    color: Colors.black87,
+  );
 }

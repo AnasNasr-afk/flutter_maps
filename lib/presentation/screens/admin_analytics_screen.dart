@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_maps/helpers/components.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../helpers/color_manager.dart';
@@ -87,7 +88,11 @@ class _AdminAnalyticsScreenState extends State<AdminAnalyticsScreen> {
         future: _statsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: CircularProgressIndicator(
+                color: Colors.blue,
+              )
+            );
           }
 
           final data = snapshot.data ?? {};

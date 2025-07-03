@@ -4,6 +4,7 @@ import 'package:flutter_maps/business_logic/mapCubit/map_cubit.dart';
 import 'package:flutter_maps/data/repository/maps_repo.dart';
 import 'package:flutter_maps/data/webService/web_service.dart';
 import 'package:flutter_maps/presentation/screens/change_password_screen.dart';
+import 'package:flutter_maps/presentation/screens/edit_profile_screen.dart';
 import 'package:flutter_maps/presentation/screens/login/loginCubit/login_cubit.dart';
 import 'package:flutter_maps/presentation/screens/map_screen.dart';
 import 'package:flutter_maps/presentation/screens/notifications_screen.dart';
@@ -29,6 +30,10 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
               create: (context) => SignupCubit(), child: const SignUpScreen()),
+        );
+      case Routes.editProfileScreen:
+        return MaterialPageRoute(
+          builder: (_) => const EditProfileScreen(),
         );
 
       case Routes.mapScreen:

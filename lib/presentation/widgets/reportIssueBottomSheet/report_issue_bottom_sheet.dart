@@ -164,7 +164,7 @@ class _ReportIssueBottomSheetState extends State<ReportIssueBottomSheet> {
       },
       child: DraggableScrollableSheet(
         expand: false,
-        initialChildSize: 0.53.h,
+        initialChildSize: 0.57.h,
         minChildSize: 0.3.h,
         maxChildSize: 0.8.h,
         builder: (context, scrollController) {
@@ -466,6 +466,7 @@ class _ReportIssueBottomSheetState extends State<ReportIssueBottomSheet> {
                         }
                       },
                     ),
+                    SizedBox(height: 20.h),
                     Column(
                       children: [
                         SizedBox(

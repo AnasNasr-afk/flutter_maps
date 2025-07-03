@@ -29,6 +29,8 @@ class AppTextFormField extends StatelessWidget {
   final ValueChanged<String>? onChanged;
   final Function(String?) validator;
   final int? maxLength;
+  final bool? readOnly;
+  final Widget? prefixIcon;
 
   const AppTextFormField({super.key,
     this.contentPadding,
@@ -53,6 +55,7 @@ class AppTextFormField extends StatelessWidget {
     this.textInputAction,
     this.helperText,
     this.maxLength,
+     this.readOnly, this.prefixIcon,
   });
 
   @override

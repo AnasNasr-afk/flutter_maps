@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_maps/helpers/components.dart';
 import 'package:flutter_maps/presentation/screens/login/loginCubit/login_cubit.dart';
 import 'package:flutter_maps/presentation/screens/login/loginCubit/login_states.dart';
 import 'package:flutter_maps/presentation/widgets/app_text_button.dart';
@@ -47,6 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   SizedBox(height: 32.h),
                   AppTextFormField(
                     controller: cubit.emailController,
+                    textInputAction: TextInputAction.done,
                     keyboardType: TextInputType.emailAddress,
                     hintText: 'Email Address',
                     validator: (value) {
@@ -60,6 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   AppTextFormField(
                     maxLines: 1,
                     hintText: 'Enter your password',
+                    textInputAction: TextInputAction.done,
                     validator: (value) {
                       if (value == null || value.isEmpty || !AppRegex.isPasswordValid(value)) {
                         return 'Enter a valid password';
@@ -90,13 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   BlocConsumer<LoginCubit, LoginStates>(
                     listener: (context, state) {
                       if (state is LoginLoadingState) {
-                        showDialog(
-                          context: context,
-                          barrierDismissible: false,
-                          builder: (_) => const Center(
-                            child: CircularProgressIndicator(color: Colors.blue),
-                          ),
-                        );
+                       showAppLoadingDialog(context);
                       }
 
                       if (state is LoginSuccessState) {

@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_maps/helpers/shared_pref_helper.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:lottie/lottie.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../business_logic/issueCubit/issue_cubit.dart';
@@ -14,76 +15,76 @@ import '../presentation/widgets/reportIssueBottomSheet/report_issue_bottom_sheet
 import '../router/routes.dart';
 import 'app_strings.dart';
 
-void showPrivacyPolicyDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (context) => Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      elevation: 10,
-      backgroundColor: Colors.white,
-      child: Padding(
-        padding: EdgeInsets.all(24.w),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(Icons.privacy_tip_outlined,
-                      size: 32.w, color: Colors.orange),
-                  SizedBox(width: 10.w),
-                  Text(
-                    'Privacy Policy',
-                    style: TextStyle(
-                      fontSize: 22.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 12.h),
-              const Divider(),
-              SizedBox(height: 12.h),
-              Text(
-                'Last updated: June 16, 2025\n\n'
-                'CleanCity respects your privacy and is committed to protecting your personal data.\n\n'
-                '1. What Data We Collect:\n'
-                '- Location (for accurate issue reporting)\n'
-                '- Email (if provided when submitting feedback)\n'
-                '- Usage data (e.g. how you interact with the app)\n\n'
-                '2. How We Use It:\n'
-                '- To show your reports on the map\n'
-                '- To contact you for feedback or support\n'
-                '- To improve our app experience\n\n'
-                '3. Your Rights:\n'
-                'You can request to delete your data at any time by emailing us.\n\n'
-                'We never share or sell your data to third parties.\n\n'
-                '📧 For questions, contact: anas.nasr132003@gmail.com',
-                style: TextStyle(fontSize: 14.sp, height: 1.4.h),
-              ),
-              SizedBox(height: 20.h),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text(
-                    'OK',
-                    style: TextStyle(
-                      color: Colors.orange,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    ),
-  );
-}
+// void showPrivacyPolicyDialog(BuildContext context) {
+//   showDialog(
+//     context: context,
+//     builder: (context) => Dialog(
+//       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+//       elevation: 10,
+//       backgroundColor: Colors.white,
+//       child: Padding(
+//         padding: EdgeInsets.all(24.w),
+//         child: SingleChildScrollView(
+//           child: Column(
+//             mainAxisSize: MainAxisSize.min,
+//             crossAxisAlignment: CrossAxisAlignment.start,
+//             children: [
+//               Row(
+//                 children: [
+//                   Icon(Icons.privacy_tip_outlined,
+//                       size: 32.w, color: Colors.orange),
+//                   SizedBox(width: 10.w),
+//                   Text(
+//                     'Privacy Policy',
+//                     style: TextStyle(
+//                       fontSize: 22.sp,
+//                       fontWeight: FontWeight.bold,
+//                       color: Colors.black87,
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//               SizedBox(height: 12.h),
+//               const Divider(),
+//               SizedBox(height: 12.h),
+//               Text(
+//                 'Last updated: June 16, 2025\n\n'
+//                 'CleanCity respects your privacy and is committed to protecting your personal data.\n\n'
+//                 '1. What Data We Collect:\n'
+//                 '- Location (for accurate issue reporting)\n'
+//                 '- Email (if provided when submitting feedback)\n'
+//                 '- Usage data (e.g. how you interact with the app)\n\n'
+//                 '2. How We Use It:\n'
+//                 '- To show your reports on the map\n'
+//                 '- To contact you for feedback or support\n'
+//                 '- To improve our app experience\n\n'
+//                 '3. Your Rights:\n'
+//                 'You can request to delete your data at any time by emailing us.\n\n'
+//                 'We never share or sell your data to third parties.\n\n'
+//                 '📧 For questions, contact: anas.nasr132003@gmail.com',
+//                 style: TextStyle(fontSize: 14.sp, height: 1.4.h),
+//               ),
+//               SizedBox(height: 20.h),
+//               Align(
+//                 alignment: Alignment.centerRight,
+//                 child: TextButton(
+//                   onPressed: () => Navigator.pop(context),
+//                   child: const Text(
+//                     'OK',
+//                     style: TextStyle(
+//                       color: Colors.orange,
+//                       fontWeight: FontWeight.bold,
+//                     ),
+//                   ),
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     ),
+//   );
+// }
 
 void showAppLoadingDialog(
   BuildContext context, {
@@ -126,121 +127,147 @@ void showReportBottomSheet(BuildContext context) {
 }
 
 void showModernAboutDialog(BuildContext context) {
-  final messenger = ScaffoldMessenger.of(context);
+
+
   showDialog(
     context: context,
     builder: (context) => Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
-      elevation: 10,
       backgroundColor: Colors.white,
       child: Padding(
-        padding: EdgeInsets.all(24.w),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.cleaning_services, size: 32.w, color: Colors.orange),
-                SizedBox(width: 10.w),
-                Text(
-                  'Clean City',
-                  style: TextStyle(
-                    fontSize: 22.sp,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              /// Header
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 20.r,
+                    backgroundColor: Colors.black87,
+                    child: const Icon(Icons.location_city, color: Colors.white),
+                  ),
+                  SizedBox(width: 12.w),
+                  Text(
+                    'CairoCrew',
+                    style: TextStyle(
+                      fontSize: 20.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 20.h),
+              Divider(thickness: 1.2, color: Colors.grey[300]),
+              SizedBox(height: 16.h),
+
+              /// About Section
+              _buildSectionTitle('🌆 About CairoCrew'),
+              _buildBodyText(
+                'CairoCrew helps residents report urban issues such as waste, damaged roads, or streetlight failures through a simple, location-based interface.',
+              ),
+
+              SizedBox(height: 16.h),
+              _buildSectionTitle('🤝 Why Your Role Matters'),
+              _buildBodyText(
+                'Your input enables local authorities to prioritize and fix issues quickly. Together, we make Cairo cleaner and more organized.',
+              ),
+
+
+
+
+              /// Terms
+              _buildLinkRow(
+                icon: Icons.article_outlined,
+                label: 'Terms & Conditions',
+                color: Colors.blue,
+                onTap: () {
+                  launchUrl(
+                    Uri.parse('https://github.com/AnasNasr-afk/flutter_maps/blob/main/TERMS.md'),
+                    mode: LaunchMode.externalApplication,
+                  );
+                },
+              ),
+
+              SizedBox(height: 16.h),
+
+              /// Version Info
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  '📱 Version: 1.0.0',
+                  style: TextStyle(fontSize: 13.sp, color: Colors.grey[600]),
+                ),
+              ),
+
+              SizedBox(height: 16.h),
+
+              /// OK Button
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: TextButton.styleFrom(foregroundColor: Colors.black87),
+                  child: const Text(
+                    'OK',
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
-              ],
-            ),
-            SizedBox(height: 12.h),
-            const Divider(),
-            SizedBox(height: 12.h),
-            Text(
-              '🌍 Community-Powered Reporting',
-              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
-            ),
-            SizedBox(height: 6.h),
-            Text(
-              'CleanCity helps citizens easily report garbage, potholes, broken lights, and other city issues using their current location.',
-              style: TextStyle(fontSize: 14.sp, height: 1.4.h),
-            ),
-            SizedBox(height: 16.h),
-            Text(
-              '🤝 How You Help',
-              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
-            ),
-            SizedBox(height: 6.h),
-            Text(
-              'By submitting reports, you contribute to a cleaner, safer, and more organized city. Every report counts.',
-              style: TextStyle(fontSize: 14.sp, height: 1.4.h),
-            ),
-            SizedBox(height: 16.h),
-            GestureDetector(
-              onTap: () async {
-                final Uri emailUri = Uri(
-                  scheme: 'mailto',
-                  path: 'anas.nasr132003@gmail.com',
-                  queryParameters: {'subject': 'CleanCity Support'},
-                );
-
-                if (await canLaunchUrl(emailUri)) {
-                  await launchUrl(emailUri);
-                } else {
-                  // fallback if mail app is not available
-                  messenger.showSnackBar(
-                    const SnackBar(
-                        content: Text('No email app found on this device.')),
-                  );
-                }
-              },
-              child: Text(
-                '📧 Contact Us: anas.nasr132003@gmail.com',
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  color: Colors.blue,
-                  decoration: TextDecoration.underline,
-                ),
               ),
-            ),
-            SizedBox(height: 8.h),
-            GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-                showPrivacyPolicyDialog(context);
-              },
-              child: Text(
-                '🔒 View our Privacy Policy',
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  color: Colors.blue,
-                  decoration: TextDecoration.underline,
-                ),
-              ),
-            ),
-            SizedBox(height: 12.h),
-            Text(
-              '📱 Version: 1.0.0',
-              style: TextStyle(fontSize: 13.sp, color: Colors.grey),
-            ),
-            SizedBox(height: 20.h),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text(
-                  'OK',
-                  style: TextStyle(
-                      color: Colors.orange, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     ),
   );
 }
+
+Widget _buildSectionTitle(String title) {
+  return Align(
+    alignment: Alignment.centerLeft,
+    child: Text(
+      title,
+      style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold, color: Colors.black87),
+    ),
+  );
+}
+
+Widget _buildBodyText(String content) {
+  return Align(
+    alignment: Alignment.centerLeft,
+    child: Text(
+      content,
+      style: TextStyle(fontSize: 13.5.sp, color: Colors.black87, height: 1.4),
+    ),
+  );
+}
+
+Widget _buildLinkRow({
+  required IconData icon,
+  required String label,
+  required Color color,
+  required VoidCallback onTap,
+}) {
+  return InkWell(
+    onTap: onTap,
+    child: Padding(
+      padding: EdgeInsets.symmetric(vertical: 8.h),
+      child: Row(
+        children: [
+          Icon(icon, size: 22.r, color: color),
+          SizedBox(width: 10.w),
+          Text(
+            label,
+            style: TextStyle(fontSize: 14.5.sp, color: color, fontWeight: FontWeight.w600),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
 
 void callSupport(BuildContext context) async {
   final messenger = ScaffoldMessenger.of(context);
@@ -256,53 +283,98 @@ void callSupport(BuildContext context) async {
   }
 }
 
+
+
 void logOut(BuildContext context) async {
   final shouldLogout = await showDialog<bool>(
     context: context,
     barrierDismissible: false,
-    builder: (context) => AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+    builder: (_) => Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20.r),
+      ),
       backgroundColor: Colors.white,
-      title: Text(
-        'Confirm Logout',
-        style: TextStyle(
-          fontSize: 20.sp,
-          fontWeight: FontWeight.bold,
-          color: Colors.black,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 28.h),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Using the selected Lottie animation
+            SizedBox(
+              height: 140.h,
+              width: 140.h,
+              child: Lottie.network(
+                'https://assets.lottiefiles.com/packages/lf20_xlmz9xwm.json', // Replace with this MinhajMK URL
+                repeat: false,
+              ),
+            ),
+            SizedBox(height: 20.h),
+            Text(
+              "Comeback Soon!",
+              style: TextStyle(
+                fontSize: 20.sp,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            SizedBox(height: 10.h),
+            Text(
+              "Are you sure you want to logout?",
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: Colors.grey[600],
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 28.h),
+            Row(
+              children: [
+                Expanded(
+                  child: TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: 14.h),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                        side: BorderSide(color: Colors.grey.shade300),
+                      ),
+                      backgroundColor: Colors.white,
+                    ),
+                    child: Text(
+                      "Cancel",
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        color: Colors.red.shade300,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: 14.h),
+                      backgroundColor: Colors.redAccent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                    ),
+                    child: Text(
+                      "Yes, Logout",
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
-      content: Text(
-        'Are you sure you want to logout?',
-        style: TextStyle(
-          fontSize: 16.sp,
-          color: Colors.black87,
-        ),
-      ),
-      actionsPadding: EdgeInsets.only(right: 16.w, bottom: 12.h),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context, true),
-          child: Text(
-            'Logout',
-            style: TextStyle(
-              color: Colors.redAccent,
-              fontSize: 15.sp,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-        TextButton(
-          onPressed: () => Navigator.pop(context, false),
-          child: Text(
-            'Cancel',
-            style: TextStyle(
-              color: Colors.grey,
-              fontSize: 15.sp,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
-      ],
     ),
   );
 
@@ -311,14 +383,15 @@ void logOut(BuildContext context) async {
     await SharedPrefHelper.removeData(userId);
 
     if (!context.mounted) return;
-
     Navigator.pushNamedAndRemoveUntil(
       context,
       Routes.loginScreen,
-      (route) => false,
+          (route) => false,
     );
   }
 }
+
+
 
 Future<bool?> showConfirmDialog({
   required BuildContext context,
@@ -378,65 +451,6 @@ Future<bool?> showConfirmDialog({
   );
 }
 
-Future<void> showDeleteAccountDialog(BuildContext context) async {
-  final confirmed = await showDialog<bool>(
-    context: context,
-    barrierDismissible: false,
-    builder: (context) => AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      title: const Row(
-        children: [
-          Icon(Icons.warning_amber_rounded, color: Colors.amber),
-          SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              'Delete Account',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-        ],
-      ),
-      content: const Text(
-        'Are you sure you want to delete your account?\nThis action is irreversible!',
-        style: TextStyle(fontSize: 14),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context, false),
-          child: const Text('Cancel'),
-        ),
-        ElevatedButton(
-          onPressed: () => Navigator.pop(context, true),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.redAccent,
-            foregroundColor: Colors.white,
-          ),
-          child: const Text('Delete'),
-        ),
-      ],
-    ),
-  );
-
-  if (confirmed == true) {
-    try {
-      final user = FirebaseAuth.instance.currentUser;
-
-      if (user != null) {
-        await user.delete();
-        await SharedPrefHelper.removeData('userId');
-      }
-
-      if (context.mounted) {
-        Navigator.pushNamedAndRemoveUntil(
-            context, Routes.loginScreen, (_) => false);
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error deleting account: ${e.toString()}')),
-      );
-    }
-  }
-}
 
 IconData getStatusIcon(String status) {
   switch (status.toLowerCase()) {

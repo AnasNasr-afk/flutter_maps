@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_maps/helpers/components.dart';
+
+import '../../helpers/color_manager.dart';
 
 class NotificationsScreen extends StatelessWidget {
   const NotificationsScreen({super.key});
@@ -16,7 +19,7 @@ class NotificationsScreen extends StatelessWidget {
         child: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.amber, Colors.orange],
+              colors: [ColorManager.gradientStart, ColorManager.gradientEnd],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -37,12 +40,12 @@ class NotificationsScreen extends StatelessWidget {
             elevation: 0,
             title: const Text(
               'Notifications',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: TextStyle(fontWeight: FontWeight.bold , fontSize: 20, color: Colors.white),
             ),
             centerTitle: true,
             actions: [
               IconButton(
-                icon: const Icon(Icons.done_all),
+                icon: const Icon(Icons.done_all, color: Colors.white),
                 tooltip: 'Mark all as read',
                 onPressed: () async {
                   if (userId != null) {
@@ -64,7 +67,7 @@ class NotificationsScreen extends StatelessWidget {
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator(color: Colors.blue,));
           }
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
