@@ -44,7 +44,12 @@ A focused, community-driven Flutter app enabling citizens to report urban issues
 ---
 
 ## 📲 Screenshots
-<img src="assets/screenshots/mapScreenshot.png" alt="Home Screen" width="300"/>  <img src="assets/screenshots/reportIssueScreenshot.png" alt="Report Issue" width="300"/> <img src="assets/screenshots/adminViewScreenshot.png" alt="Admin View" width="300"/>
+
+<div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+<div style="text-align: center;">
+    <div style="font-weight: bold; margin-bottom: 6px;">Home Screen</div>
+    <img src="assets/screenshots/mapScreenshot.png" alt="Home Screen" width="300"/>
+  </div><div style="text-align: center;"><div style="font-weight: bold; margin-bottom: 6px;">Report Issue</div><img src="assets/screenshots/reportIssueScreenshot.png" alt="Report Issue" width="300"/></div><div style="text-align: center;"><div style="font-weight: bold; margin-bottom: 6px;">Admin View</div><img src="assets/screenshots/adminViewScreenshot.png" alt="Admin View" width="300"/></div></div>
 
 
 ---
@@ -61,6 +66,19 @@ A focused, community-driven Flutter app enabling citizens to report urban issues
 
 ---
 
+## 🚀 CI/CD & Firebase App Distribution
+
+- **CI/CD Setup:**  
+  Integrated using **GitHub Actions** to automate the build and release process for both Android and iOS.
+
+- **Firebase App Distribution:**
+  - Testers receive an email to download the latest build.
+  - Internal QA and stakeholders can easily test new features before release.
+  - Supports versioned release notes and crash logs (via Firebase Crashlytics if integrated).
+
+
+---
+
 ## 💡 Showcase
 
 - Instantly report garbage, potholes, or broken infrastructure from anywhere in your city.
@@ -69,6 +87,5 @@ A focused, community-driven Flutter app enabling citizens to report urban issues
 - Help make your city cleaner and safer, one report at a time.
 
 ---
-
 
 Built with ❤️ using Flutter & Google Maps.
