@@ -98,17 +98,28 @@ class _MapScreenState extends State<MapScreen> {
                 );
               },
             ),
+          // Drawer Icon (Top-left)
+          Positioned(
+            top: 60.h,
+            left: 10.w,
+            child: Builder(
+              builder: (context) => FloatingActionButton.small(
+                heroTag: 'menu_fab',
+                backgroundColor: Colors.white,
+                elevation: 2,
+                onPressed: () => Scaffold.of(context).openDrawer(),
+                child:  Icon(Icons.menu, color: Colors.black , size: 24.sp),
+              ),
+            ),
+          ),
+
 
           /// Search Bar
-          MapSearchBar(
-            onSuggestionSelected: (marker) {
-              setState(() => cubit.addSearchMarker(marker));
-            },
-          ),
+
 
           /// Legend FAB and Window
           Positioned(
-            top: 120.h,
+            top: 65.h,
             right: 10.w,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -119,9 +130,11 @@ class _MapScreenState extends State<MapScreen> {
                   onPressed: () {
                     setState(() => _isLegendVisible = !_isLegendVisible);
                   },
+                  elevation: 2,
                   child: Icon(
                     _isLegendVisible ? Icons.close : Icons.info_outline,
                     color: Colors.black,
+                    size: 24.sp,
                   ),
                 ),
                 SizedBox(height: 8.h),
@@ -206,104 +219,111 @@ class _MapScreenState extends State<MapScreen> {
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
 
        drawer: Drawer(
+
           backgroundColor: Colors.white,
-          child: SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 24.h),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [ColorManager.gradientStart, ColorManager.gradientEnd],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 8.r,
-                        offset: Offset(0, 3.h),
-                      ),
-                    ],
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(20.r),
-                      bottomRight: Radius.circular(20.r),
-                    ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Container(
+                padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).padding.top.h, // ← this line is key
+                  left: 16.w,
+                  right: 16.w,
+                  bottom: 24.h,
+                ),
+                decoration: BoxDecoration(
+
+                  gradient: const LinearGradient(
+                    colors: [ColorManager.gradientStart, ColorManager.gradientEnd],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
-                  child: Row(
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                (FirebaseAuth.instance.currentUser?.displayName?.split(' ').first ?? 'User'),
-                                style: TextStyle(
-                                  fontSize: 25.sp,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              SizedBox(height: 6.h),
-                              Text(
-                                FirebaseAuth.instance.currentUser?.email ?? 'No email found',
-                                style: TextStyle(
-                                  fontSize: 15.sp,
-                                  color: Colors.white70,
-                                ),
-                              ),
-                            ],
-                          ),
-
-                        ],
-                      ),
-
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 8.r,
+                      offset: Offset(0, 3.h),
+                    ),
+                  ],
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(20.r),
+                    bottomRight: Radius.circular(20.r),
                   ),
-                SizedBox(height: 24.h),
-                BuildDrawerItem(
-                  icon: Icons.report_problem_outlined,
-                  title: 'Reported Issues',
-                  onTap: () => Navigator.popAndPushNamed(context, Routes.userReportsScreen),
                 ),
-                Divider(height: 32.h, thickness: 1, indent: 16.w, endIndent: 16.w, color: Colors.grey.shade300),
-                BuildDrawerItem(
-                  icon: Icons.edit_outlined,
-                  title: 'Edit Profile',
-                  onTap: () => Navigator.popAndPushNamed(context, Routes.editProfileScreen),
-                ),
-                Divider(height: 32.h, thickness: 1, indent: 16.w, endIndent: 16.w, color: Colors.grey.shade300),
-                BuildDrawerItem(
-                  icon: Icons.notifications_active_outlined,
-                  title: 'Notifications',
-                  onTap: () => Navigator.popAndPushNamed(context, Routes.notificationsScreen),
-                ),
-                Divider(height: 32.h, thickness: 1, indent: 16.w, endIndent: 16.w, color: Colors.grey.shade300),
-                BuildDrawerItem(
-                  icon: Icons.support_agent,
-                  title: 'Call Support',
-                  onTap: () => callSupport(context),
-                ),
-                Divider(height: 32.h, thickness: 1, indent: 16.w, endIndent: 16.w, color: Colors.grey.shade300),
-                BuildDrawerItem(
-                  icon: Icons.lock_outline,
-                  title: 'Change Password',
-                  onTap: () => Navigator.popAndPushNamed(context, Routes.changePasswordScreen),
-                ),
-                Divider(height: 32.h, thickness: 1, indent: 16.w, endIndent: 16.w, color: Colors.grey.shade300),
-                BuildDrawerItem(
-                  icon: Icons.info_outline,
-                  title: 'About App',
-                  onTap: () => showModernAboutDialog(context),
-                ),
-                Divider(height: 32.h, thickness: 1, indent: 16.w, endIndent: 16.w, color: Colors.grey.shade300),
-                BuildDrawerItem(
-                  icon: Icons.logout,
-                  title: 'Logout',
-                  onTap: () => logOut(context),
-                ),
+                child: Row(
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              (FirebaseAuth.instance.currentUser?.displayName?.split(' ').first ?? 'User'),
+                              style: TextStyle(
+                                fontSize: 25.sp,
+                                overflow: TextOverflow.ellipsis,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            SizedBox(height: 6.h),
+                            Text(
+                              FirebaseAuth.instance.currentUser?.email ?? 'No email found',
+                              style: TextStyle(
+                                fontSize: 15.sp,
+                                overflow: TextOverflow.ellipsis,
+                                color: Colors.white70,
+                              ),
+                            ),
+                          ],
+                        ),
 
-              ],
-            ),
+                      ],
+                    ),
+
+                ),
+              SizedBox(height: 24.h),
+              BuildDrawerItem(
+                icon: Icons.report_problem_outlined,
+                title: 'Reported Issues',
+                onTap: () => Navigator.popAndPushNamed(context, Routes.userReportsScreen),
+              ),
+              Divider(height: 32.h, thickness: 1, indent: 16.w, endIndent: 16.w, color: Colors.grey.shade300),
+              BuildDrawerItem(
+                icon: Icons.edit_outlined,
+                title: 'Edit Profile',
+                onTap: () => Navigator.popAndPushNamed(context, Routes.editProfileScreen),
+              ),
+              Divider(height: 32.h, thickness: 1, indent: 16.w, endIndent: 16.w, color: Colors.grey.shade300),
+              BuildDrawerItem(
+                icon: Icons.notifications_active_outlined,
+                title: 'Notifications',
+                onTap: () => Navigator.popAndPushNamed(context, Routes.notificationsScreen),
+              ),
+              Divider(height: 32.h, thickness: 1, indent: 16.w, endIndent: 16.w, color: Colors.grey.shade300),
+              BuildDrawerItem(
+                icon: Icons.support_agent,
+                title: 'Call Support',
+                onTap: () => callSupport(context),
+              ),
+              Divider(height: 32.h, thickness: 1, indent: 16.w, endIndent: 16.w, color: Colors.grey.shade300),
+              BuildDrawerItem(
+                icon: Icons.lock_outline,
+                title: 'Change Password',
+                onTap: () => Navigator.popAndPushNamed(context, Routes.changePasswordScreen),
+              ),
+              Divider(height: 32.h, thickness: 1, indent: 16.w, endIndent: 16.w, color: Colors.grey.shade300),
+              BuildDrawerItem(
+                icon: Icons.info_outline,
+                title: 'About App',
+                onTap: () => showModernAboutDialog(context),
+              ),
+              Divider(height: 32.h, thickness: 1, indent: 16.w, endIndent: 16.w, color: Colors.grey.shade300),
+              BuildDrawerItem(
+                icon: Icons.logout,
+                title: 'Logout',
+                onTap: () => logOut(context),
+              ),
+
+            ],
           ),
         ),
 
