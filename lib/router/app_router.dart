@@ -8,6 +8,7 @@ import 'package:flutter_maps/presentation/screens/edit_profile_screen.dart';
 import 'package:flutter_maps/presentation/screens/login/loginCubit/login_cubit.dart';
 import 'package:flutter_maps/presentation/screens/map_screen.dart';
 import 'package:flutter_maps/presentation/screens/notifications_screen.dart';
+import 'package:flutter_maps/presentation/screens/onboarding_screen.dart';
 import 'package:flutter_maps/presentation/screens/signUp/signupCubit/signup_cubit.dart';
 import 'package:flutter_maps/router/routes.dart';
 
@@ -34,6 +35,10 @@ class AppRouter {
       case Routes.editProfileScreen:
         return MaterialPageRoute(
           builder: (_) => const EditProfileScreen(),
+        );
+      case Routes.onboardingScreen:
+        return MaterialPageRoute(
+          builder: (_) => const OnboardingScreen(),
         );
 
       case Routes.mapScreen:

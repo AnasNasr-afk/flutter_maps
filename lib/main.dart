@@ -71,9 +71,10 @@ class MapsApp extends StatelessWidget {
       designSize: const Size(375,812),
       minTextAdapt: true,
       child: MaterialApp(
+
         title: 'Flutter Maps',
         debugShowCheckedModeBanner: false,
-        initialRoute: isLoggedIn ? Routes.mapScreen : Routes.loginScreen,
+        initialRoute: isLoggedIn ? Routes.mapScreen : Routes.onboardingScreen,
         onGenerateRoute: appRouter.generateRoutes,
       ),
     );

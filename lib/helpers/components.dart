@@ -6,11 +6,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_maps/helpers/shared_pref_helper.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:lottie/lottie.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../business_logic/issueCubit/issue_cubit.dart';
 import '../business_logic/mapCubit/map_cubit.dart';
+import '../presentation/widgets/fade_in_lottie.dart';
 import '../presentation/widgets/reportIssueBottomSheet/report_issue_bottom_sheet.dart';
 import '../router/routes.dart';
 import 'app_strings.dart';
@@ -300,14 +300,7 @@ void logOut(BuildContext context) async {
           mainAxisSize: MainAxisSize.min,
           children: [
             // Using the selected Lottie animation
-            SizedBox(
-              height: 140.h,
-              width: 140.h,
-              child: Lottie.network(
-                'https://assets.lottiefiles.com/packages/lf20_xlmz9xwm.json', // Replace with this MinhajMK URL
-                repeat: false,
-              ),
-            ),
+            const FadeInLottieAnimation(),
             SizedBox(height: 20.h),
             Text(
               "Comeback Soon!",

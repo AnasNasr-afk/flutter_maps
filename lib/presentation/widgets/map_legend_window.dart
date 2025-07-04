@@ -10,7 +10,6 @@ class MapLegendWindow extends StatelessWidget {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     final Map<String, Color> statusColors = {
-      'Search Marker': Colors.deepPurple, // default marker
       'Pending': getStatusColor('pending'),
       'In Progress': getStatusColor('inProgress'),
       'Resolved': getStatusColor('resolved'),

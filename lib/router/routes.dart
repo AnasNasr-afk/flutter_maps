@@ -9,6 +9,8 @@ class Routes {
   static const String adminAnalyticsScreen = '/adminAnalyticsScreen';
   static const String editProfileScreen = '/editProfileScreen';
 
+  static const String onboardingScreen = '/onboardingScreen';
+
 
 
 

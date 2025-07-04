@@ -63,7 +63,7 @@ class _UserReportsScreenState extends State<UserReportsScreen> {
       body: BlocBuilder<UserReportsCubit, UserReportsStates>(
         builder: (context, state) {
           if (state is UserReportsLoadingState || state is UserReportsInitialState) {
-            return const Center(child: CircularProgressIndicator(color: Colors.blue,));
+            return const Center(child: CircularProgressIndicator(color: Colors.blue));
           }
           if (state is UserReportsErrorState) {
             return Center(child: Text(state.message ?? 'Failed to load reports.'));
@@ -103,11 +103,11 @@ class _UserReportsScreenState extends State<UserReportsScreen> {
                     return Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(16.r),
-                        boxShadow: const [
+                        borderRadius: BorderRadius.circular(20.r),
+                        boxShadow: [
                           BoxShadow(
                             color: Colors.black12,
-                            blurRadius: 6,
+                            blurRadius: 8,
                             offset: Offset(0, 3),
                           ),
                         ],
@@ -116,46 +116,65 @@ class _UserReportsScreenState extends State<UserReportsScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          /// Header
+                          /// User Header
                           Row(
                             children: [
+                              CircleAvatar(
+                                radius: 18.r,
+                                backgroundColor: Colors.blue.shade100,
+                                child: Icon(Icons.person, size: 18.r, color: Colors.blue),
+                              ),
+                              SizedBox(width: 8.w),
                               Expanded(
-                                child: Text(
-                                  issue['category'] ?? 'Unknown',
-                                  style: TextStyle(
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      issue['userName'] ?? 'Unknown',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14.sp,
+                                      ),
+                                    ),
+                                    if (createdAt != null)
+                                      Text(
+                                        'Reported on ${formatDate(createdAt)}',
+                                        style: TextStyle(
+                                          fontSize: 12.sp,
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
+                                  ],
                                 ),
                               ),
                               buildStatusPill(status),
                             ],
                           ),
-                          SizedBox(height: 4.h),
-                          if (createdAt != null)
-                            Text(
-                              'Reported ${formatDate(createdAt)}',
-                              style: TextStyle(
-                                fontSize: 12.sp,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                          SizedBox(height: 12.h),
+                          SizedBox(height: 16.h),
 
-                          /// Description
+                          /// Category & Description
+                          Text(
+                            issue['category'] ?? 'Unknown Category',
+                            style: TextStyle(
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          SizedBox(height: 8.h),
                           Text(
                             issue['description']?.toString().trim().isNotEmpty ?? false
                                 ? issue['description']
                                 : 'No description provided.',
-                            style: TextStyle(fontSize: 14.sp, height: 1.4),
+                            style: TextStyle(fontSize: 13.5.sp, height: 1.4, color: Colors.black87),
                           ),
 
                           /// Image Before
                           if (issue['image'] != null && issue['image'].toString().isNotEmpty)
                             ...[
-                              SizedBox(height: 12.h),
+                              SizedBox(height: 14.h),
                               Text('Attached Image', style: _sectionHeaderStyle()),
-                              SizedBox(height: 8.h),
+                              SizedBox(height: 6.h),
                               buildIssueImage(context, issue['image']),
                             ],
 
@@ -163,28 +182,14 @@ class _UserReportsScreenState extends State<UserReportsScreen> {
                           if (issue['adminResolvedImage'] != null &&
                               issue['adminResolvedImage'].toString().isNotEmpty)
                             ...[
-                              SizedBox(height: 12.h),
+                              SizedBox(height: 14.h),
                               Text('Resolved Image', style: _sectionHeaderStyle()),
-                              SizedBox(height: 8.h),
+                              SizedBox(height: 6.h),
                               buildIssueImage(context, issue['adminResolvedImage']),
                             ],
 
-                          /// User info
-                          SizedBox(height: 12.h),
-                          Text('Submitted by', style: _sectionHeaderStyle()),
-                          SizedBox(height: 4.h),
-                          Text(
-                            issue['userName'] ?? 'Unknown',
-                            style: TextStyle(fontSize: 13.sp, color: Colors.black87),
-                          ),
-                          Text(
-                            issue['userEmail'] ?? 'Unknown',
-                            style: TextStyle(fontSize: 13.sp, color: Colors.grey[700]),
-                          ),
-
-                          /// Admin Controls
-                          if (isAdmin) ...[
-                            SizedBox(height: 12.h),
+                          /// Admin Actions
+                          if (isAdmin)
                             Align(
                               alignment: Alignment.centerRight,
                               child: IconButton(
@@ -194,8 +199,7 @@ class _UserReportsScreenState extends State<UserReportsScreen> {
                                     context: context,
                                     builder: (context) => AlertDialog(
                                       title: const Text('Confirm Deletion'),
-                                      content: const Text(
-                                          'Are you sure you want to delete this issue?'),
+                                      content: const Text('Are you sure you want to delete this issue?'),
                                       actions: [
                                         TextButton(
                                           onPressed: () => Navigator.pop(context, false),
@@ -221,8 +225,7 @@ class _UserReportsScreenState extends State<UserReportsScreen> {
                                   }
                                 },
                               ),
-                            )
-                          ]
+                            ),
                         ],
                       ),
                     );
