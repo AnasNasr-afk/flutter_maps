@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_maps/helpers/color_manager.dart';
 import 'package:flutter_maps/presentation/screens/signUp/signupCubit/signup_cubit.dart';
 import 'package:flutter_maps/presentation/screens/signUp/signupCubit/signup_states.dart';
 import 'package:flutter_maps/presentation/widgets/app_text_form_field.dart';
@@ -43,7 +44,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         final isLoading = state is SignupLoadingState;
 
         return Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: ColorManager.lightTeal,
           body: Form(
             key: cubit.formKey,
             child: SafeArea(

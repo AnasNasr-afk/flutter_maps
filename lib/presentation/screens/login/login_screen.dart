@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_maps/helpers/color_manager.dart';
 import 'package:flutter_maps/helpers/components.dart';
 import 'package:flutter_maps/presentation/screens/login/loginCubit/login_cubit.dart';
 import 'package:flutter_maps/presentation/screens/login/loginCubit/login_states.dart';
@@ -25,7 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     var cubit = LoginCubit.get(context);
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: ColorManager.lightTeal,
       body: SafeArea(
         child: Form(
           key: cubit.formKey,
