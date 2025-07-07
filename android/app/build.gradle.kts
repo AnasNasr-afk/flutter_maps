@@ -6,12 +6,12 @@ plugins {
 }
 
 android {
-    namespace = "com.anasnasr.flutter_maps"
+    namespace = "com.anasnasr.cairocrew"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "27.0.12077973" // Match Firebase plugins' required NDK
 
     defaultConfig {
-        applicationId = "com.anasnasr.flutter_maps"
+        applicationId = "com.anasnasr.cairocrew"
         minSdk = 23 // Required for Firebase
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
@@ -45,6 +45,9 @@ dependencies {
     // ✅ REQUIRED for Java 8 desugaring
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 
+    // ✅ Kotlin stdlib — MISSING in your case
+    implementation("org.jetbrains.kotlin:kotlin-stdlib")
+
     // ✅ Firebase BoM (manages compatible versions automatically)
     implementation(platform("com.google.firebase:firebase-bom:33.15.0"))
 
@@ -54,3 +57,4 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-storage")
 }
+

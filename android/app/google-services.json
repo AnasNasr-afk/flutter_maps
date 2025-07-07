@@ -7,12 +7,20 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:199041491527:android:b7441a0df8a21a048b4762",
+        "mobilesdk_app_id": "1:199041491527:android:a76671633d841ac28b4762",
         "android_client_info": {
-          "package_name": "com.anasnasr.flutter_maps"
+          "package_name": "com.anasnasr.cairocrew"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "199041491527-lhbidg1mi4hh6c767b9sp92mkk6q9i3f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.anasnasr.cairocrew",
+            "certificate_hash": "75b067037028db2ddd2deec55355245b0a036fda"
+          }
+        },
         {
           "client_id": "199041491527-eucfkgomn7rej6vatvhsc5vkoov1e9ta.apps.googleusercontent.com",
           "client_type": 3
@@ -20,7 +28,7 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBbswJFyR3NoLPQtAG3vRGDIis-YOKPx_M"
+          "current_key": "AIzaSyCk0vnmPwmoe3fN3rAlUBIyU82_Yrw_dMg"
         }
       ],
       "services": {

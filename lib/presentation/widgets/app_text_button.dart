@@ -18,12 +18,12 @@ class AppTextButton extends StatelessWidget {
       onPressed: onPressed,
       style: buttonStyle ??
           ButtonStyle(
-            backgroundColor: const WidgetStatePropertyAll(Colors.black),
+            backgroundColor: const WidgetStatePropertyAll(Colors.blue),
             minimumSize:  WidgetStatePropertyAll(
-              Size(80.w, 50.h),
+              Size(320.w, 50.h),
             ),
             shape: WidgetStatePropertyAll(
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r))),
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r))),
           ),
       child: text ,
 
