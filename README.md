@@ -2,6 +2,7 @@
 
 A focused, community-driven Flutter app enabling citizens to report urban issues (garbage, potholes, broken lights, etc.) using real-time location and map technology, with instant cloud-based submission.
 
+[🎥 Watch Demo](https://drive.google.com/file/d/1MPr_NH0U6i03E9jUVXijTPBy_XZlNZv6/view?usp=drivesdk)
 ---
 
 ## 🏗️ System Design Overview
