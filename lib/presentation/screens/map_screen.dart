@@ -15,7 +15,6 @@ import '../../router/routes.dart';
 import '../widgets/build_drawer_item.dart';
 import '../widgets/glowing_fab.dart';
 import '../widgets/map_legend_window.dart';
-import '../widgets/map_search_bar.dart';
 import '../widgets/map_selected_location_listener.dart';
 
 class MapScreen extends StatefulWidget {
@@ -31,16 +30,6 @@ class _MapScreenState extends State<MapScreen> {
   CameraPosition? cameraPosition;
   Completer<GoogleMapController> controllerCompleter = Completer();
   bool _isLegendVisible = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _initLocation();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      sessionToken = const Uuid().v4();
-      MapCubit.get(context).loadMarkersFromFirebase();
-    });
-  }
 
   Future<void> _initLocation() async {
     try {
@@ -62,9 +51,18 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _initLocation();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      sessionToken = const Uuid().v4();
+      MapCubit.get(context).loadMarkersFromFirebase();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final cubit = MapCubit.get(context);
-
     cubit.setContext(context);
 
     return Scaffold(
@@ -76,9 +74,7 @@ class _MapScreenState extends State<MapScreen> {
               current is MapMarkerState || current is MapRouteState,
               builder: (context, state) {
                 return GoogleMap(
-
                   zoomControlsEnabled: false,
-
                   myLocationEnabled: true,
                   myLocationButtonEnabled: false,
                   initialCameraPosition: cameraPosition!,
@@ -98,7 +94,10 @@ class _MapScreenState extends State<MapScreen> {
                 );
               },
             ),
-          // Drawer Icon (Top-left)
+          if (cameraPosition == null)
+            const Center(
+              child: CircularProgressIndicator(),
+            ),
           Positioned(
             top: 60.h,
             left: 10.w,
@@ -108,16 +107,10 @@ class _MapScreenState extends State<MapScreen> {
                 backgroundColor: Colors.white,
                 elevation: 2,
                 onPressed: () => Scaffold.of(context).openDrawer(),
-                child:  Icon(Icons.menu, color: Colors.black , size: 24.sp),
+                child: Icon(Icons.menu, color: Colors.black, size: 24.sp),
               ),
             ),
           ),
-
-
-          /// Search Bar
-
-
-          /// Legend FAB and Window
           Positioned(
             top: 65.h,
             right: 10.w,
@@ -150,41 +143,36 @@ class _MapScreenState extends State<MapScreen> {
               ],
             ),
           ),
-
-          /// Custom My Location Button (bottom right)
           Positioned(
             bottom: 120.h,
             right: 15.w,
             child: FloatingActionButton.small(
-
               heroTag: 'my_location_fab',
               backgroundColor: Colors.white,
               onPressed: () async {
-                final currentPosition = await LocationHelper.getCurrentLocation();
-                final controller = await controllerCompleter.future;
-                controller.animateCamera(
-                  CameraUpdate.newLatLng(
-                    LatLng(currentPosition.latitude, currentPosition.longitude),
-                  ),
-                );
+                try {
+                  final currentPosition = await LocationHelper.getCurrentLocation();
+                  final controller = await controllerCompleter.future;
+                  controller.animateCamera(
+                    CameraUpdate.newLatLng(
+                      LatLng(currentPosition.latitude, currentPosition.longitude),
+                    ),
+                  );
+                } catch (e) {
+                  showError(context, e.toString());
+                }
               },
-              child:  Icon(Icons.my_location,
-                  size: 24.sp,
-                  color: Colors.black),
+              child: Icon(Icons.my_location, size: 24.sp, color: Colors.black),
             ),
           ),
-
           const MapSelectedLocationListener(),
         ],
       ),
-
       floatingActionButton: BlocBuilder<MapCubit, MapStates>(
         builder: (context, state) {
           if (!cubit.isAdminChecked) {
             return FloatingActionButton(
-              onPressed: () {
-
-              },
+              onPressed: () {},
               backgroundColor: Colors.transparent,
               elevation: 0,
               child: TweenAnimationBuilder<double>(
@@ -212,121 +200,112 @@ class _MapScreenState extends State<MapScreen> {
               }
             },
           );
-
-
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-
-       drawer: Drawer(
-
-          backgroundColor: Colors.white,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(
-                padding: EdgeInsets.only(
-                  top: MediaQuery.of(context).padding.top.h, // ← this line is key
-                  left: 16.w,
-                  right: 16.w,
-                  bottom: 24.h,
+      drawer: Drawer(
+        backgroundColor: Colors.white,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              padding: EdgeInsets.only(
+                top: MediaQuery.of(context).padding.top.h,
+                left: 16.w,
+                right: 16.w,
+                bottom: 24.h,
+              ),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [ColorManager.gradientStart, ColorManager.gradientEnd],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-                decoration: BoxDecoration(
-
-                  gradient: const LinearGradient(
-                    colors: [ColorManager.gradientStart, ColorManager.gradientEnd],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 8.r,
+                    offset: Offset(0, 3.h),
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black26,
-                      blurRadius: 8.r,
-                      offset: Offset(0, 3.h),
-                    ),
-                  ],
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(20.r),
-                    bottomRight: Radius.circular(20.r),
-                  ),
+                ],
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(20.r),
+                  bottomRight: Radius.circular(20.r),
                 ),
-                child: Row(
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              (FirebaseAuth.instance.currentUser?.displayName?.split(' ').first ?? 'User'),
-                              style: TextStyle(
-                                fontSize: 25.sp,
-                                overflow: TextOverflow.ellipsis,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            SizedBox(height: 6.h),
-                            Text(
-                              FirebaseAuth.instance.currentUser?.email ?? 'No email found',
-                              style: TextStyle(
-                                fontSize: 15.sp,
-                                overflow: TextOverflow.ellipsis,
-                                color: Colors.white70,
-                              ),
-                            ),
-                          ],
+              ),
+              child: Row(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        (FirebaseAuth.instance.currentUser?.displayName?.split(' ').first ?? 'User'),
+                        style: TextStyle(
+                          fontSize: 25.sp,
+                          overflow: TextOverflow.ellipsis,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
-
-                      ],
-                    ),
-
-                ),
-              SizedBox(height: 24.h),
-              BuildDrawerItem(
-                icon: Icons.report_problem_outlined,
-                title: 'Reported Issues',
-                onTap: () => Navigator.popAndPushNamed(context, Routes.userReportsScreen),
+                      ),
+                      SizedBox(height: 6.h),
+                      Text(
+                        FirebaseAuth.instance.currentUser?.email ?? 'No email found',
+                        style: TextStyle(
+                          fontSize: 15.sp,
+                          overflow: TextOverflow.ellipsis,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              Divider(height: 32.h, thickness: 1, indent: 16.w, endIndent: 16.w, color: Colors.grey.shade300),
-              BuildDrawerItem(
-                icon: Icons.edit_outlined,
-                title: 'Edit Profile',
-                onTap: () => Navigator.popAndPushNamed(context, Routes.editProfileScreen),
-              ),
-              Divider(height: 32.h, thickness: 1, indent: 16.w, endIndent: 16.w, color: Colors.grey.shade300),
-              BuildDrawerItem(
-                icon: Icons.notifications_active_outlined,
-                title: 'Notifications',
-                onTap: () => Navigator.popAndPushNamed(context, Routes.notificationsScreen),
-              ),
-              Divider(height: 32.h, thickness: 1, indent: 16.w, endIndent: 16.w, color: Colors.grey.shade300),
-              BuildDrawerItem(
-                icon: Icons.support_agent,
-                title: 'Call Support',
-                onTap: () => callSupport(context),
-              ),
-              Divider(height: 32.h, thickness: 1, indent: 16.w, endIndent: 16.w, color: Colors.grey.shade300),
-              BuildDrawerItem(
-                icon: Icons.lock_outline,
-                title: 'Change Password',
-                onTap: () => Navigator.popAndPushNamed(context, Routes.changePasswordScreen),
-              ),
-              Divider(height: 32.h, thickness: 1, indent: 16.w, endIndent: 16.w, color: Colors.grey.shade300),
-              BuildDrawerItem(
-                icon: Icons.info_outline,
-                title: 'About App',
-                onTap: () => showModernAboutDialog(context),
-              ),
-              Divider(height: 32.h, thickness: 1, indent: 16.w, endIndent: 16.w, color: Colors.grey.shade300),
-              BuildDrawerItem(
-                icon: Icons.logout,
-                title: 'Logout',
-                onTap: () => logOut(context),
-              ),
-
-            ],
-          ),
+            ),
+            SizedBox(height: 24.h),
+            BuildDrawerItem(
+              icon: Icons.report_problem_outlined,
+              title: 'Reported Issues',
+              onTap: () => Navigator.popAndPushNamed(context, Routes.userReportsScreen),
+            ),
+            Divider(height: 32.h, thickness: 1, indent: 16.w, endIndent: 16.w, color: Colors.grey.shade300),
+            BuildDrawerItem(
+              icon: Icons.edit_outlined,
+              title: 'Edit Profile',
+              onTap: () => Navigator.popAndPushNamed(context, Routes.editProfileScreen),
+            ),
+            Divider(height: 32.h, thickness: 1, indent: 16.w, endIndent: 16.w, color: Colors.grey.shade300),
+            BuildDrawerItem(
+              icon: Icons.notifications_active_outlined,
+              title: 'Notifications',
+              onTap: () => Navigator.popAndPushNamed(context, Routes.notificationsScreen),
+            ),
+            Divider(height: 32.h, thickness: 1, indent: 16.w, endIndent: 16.w, color: Colors.grey.shade300),
+            BuildDrawerItem(
+              icon: Icons.support_agent,
+              title: 'Call Support',
+              onTap: () => callSupport(context),
+            ),
+            Divider(height: 32.h, thickness: 1, indent: 16.w, endIndent: 16.w, color: Colors.grey.shade300),
+            BuildDrawerItem(
+              icon: Icons.lock_outline,
+              title: 'Change Password',
+              onTap: () => Navigator.popAndPushNamed(context, Routes.changePasswordScreen),
+            ),
+            Divider(height: 32.h, thickness: 1, indent: 16.w, endIndent: 16.w, color: Colors.grey.shade300),
+            BuildDrawerItem(
+              icon: Icons.info_outline,
+              title: 'About App',
+              onTap: () => showModernAboutDialog(context),
+            ),
+            Divider(height: 32.h, thickness: 1, indent: 16.w, endIndent: 16.w, color: Colors.grey.shade300),
+            BuildDrawerItem(
+              icon: Icons.logout,
+              title: 'Logout',
+              onTap: () => logOut(context),
+            ),
+          ],
         ),
-
+      ),
     );
   }
 }

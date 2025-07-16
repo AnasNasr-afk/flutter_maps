@@ -14,6 +14,7 @@ import '../presentation/widgets/fade_in_lottie.dart';
 import '../presentation/widgets/reportIssueBottomSheet/report_issue_bottom_sheet.dart';
 import '../router/routes.dart';
 import 'app_strings.dart';
+import 'components.dart' as Fluttertoast;
 
 // void showPrivacyPolicyDialog(BuildContext context) {
 //   showDialog(
@@ -613,3 +614,14 @@ Color getStatusColor(String status) {
       return Colors.grey.shade600;
   }
 }
+
+void showError(BuildContext context, String message) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(message),
+      backgroundColor: Colors.red,
+      duration: Duration(seconds: 3),
+    ),
+  );
+}
+
