@@ -14,7 +14,7 @@ import '../presentation/widgets/fade_in_lottie.dart';
 import '../presentation/widgets/reportIssueBottomSheet/report_issue_bottom_sheet.dart';
 import '../router/routes.dart';
 import 'app_strings.dart';
-import 'components.dart' as Fluttertoast;
+
 
 // void showPrivacyPolicyDialog(BuildContext context) {
 //   showDialog(

@@ -40,8 +40,8 @@ android {
         applicationId = "com.anasnasr.cairocrew"
         minSdk = 23
         targetSdk = 35
-        versionCode = 5
-        versionName = "1.0.4"
+        versionCode = 7
+        versionName = "1.0.6"
         manifestPlaceholders["MAPS_API_KEY"] = MAPS_API_KEY
     }
 
