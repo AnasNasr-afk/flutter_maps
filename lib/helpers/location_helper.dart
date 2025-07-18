@@ -1,36 +1,83 @@
-  import 'package:geolocator/geolocator.dart';
-  import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'dart:async';
+import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
 
-  class LocationHelper {
-    static Future<Position> getCurrentLocation() async {
+class LocationHelper {
+  static Future<Position> getCurrentLocation() async {
+    try {
       bool isServiceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!isServiceEnabled) {
-        return Future.error("Location services are disabled.");
+        // Prompt the user to enable location services
+        await Geolocator.openLocationSettings();
+        // Recheck after user opens settings
+        isServiceEnabled = await Geolocator.isLocationServiceEnabled();
+        if (!isServiceEnabled) {
+          throw LocationServiceDisabledException();
+        }
       }
 
       LocationPermission permission = await Geolocator.checkPermission();
+
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          return Future.error("Location permissions are denied.");
+          throw LocationPermissionDeniedException();
         }
       }
 
       if (permission == LocationPermission.deniedForever) {
-        return Future.error("Location permissions are permanently denied. Please enable them in settings.");
+        await Geolocator.openAppSettings();
+        throw LocationPermissionPermanentlyDeniedException();
       }
 
-      return await Geolocator.getCurrentPosition();
-    }
-    // TODO: Utility to parse location string to LatLng
-    static LatLng? extractLatLngFromString(String? location) {
-      if (location == null) return null;
-      final parts = location.split(',');
-      if (parts.length != 2) return null;
-      final lat = double.tryParse(parts[0].trim());
-      final lng = double.tryParse(parts[1].trim());
-      if (lat == null || lng == null) return null;
-      return LatLng(lat, lng);
-    }
+      Position position = await Geolocator.getCurrentPosition(
+        locationSettings: LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: const Duration(seconds: 10),
+        ),
+      );
 
+      return position;
+    } catch (e) {
+      if (e is LocationServiceDisabledException) {
+        throw "Location services are disabled. Please enable them in your device settings.";
+      } else if (e is LocationPermissionDeniedException) {
+        throw "Location permission denied. Please allow location access.";
+      } else if (e is LocationPermissionPermanentlyDeniedException) {
+        throw "Location permission permanently denied. Please enable it in app settings.";
+      } else if (e is TimeoutException) {
+        throw "Location request timed out. Please try again.";
+      } else {
+        throw "Failed to get location: ${e.toString()}";
+      }
+    }
   }
+
+
+  // Helper method to check if we have location permission
+  static Future<bool> hasLocationPermission() async {
+    final status = await Permission.location.status;
+    return status.isGranted;
+  }
+
+  // Helper method to check if location services are enabled
+  static Future<bool> isLocationServiceEnabled() async {
+    return await Geolocator.isLocationServiceEnabled();
+  }
+
+  // Method to open app settings for permissions
+  static Future<void> openAppSettings() async {
+    await openAppSettings(); // From permission_handler
+  }
+
+  // Method to open location settings
+  static Future<void> openLocationSettings() async {
+    await Geolocator.openLocationSettings();
+  }
+}
+
+class LocationServiceDisabledException implements Exception {}
+
+class LocationPermissionDeniedException implements Exception {}
+
+class LocationPermissionPermanentlyDeniedException implements Exception {}

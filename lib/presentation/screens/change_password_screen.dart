@@ -20,7 +20,9 @@ class ChangePasswordScreen extends StatefulWidget {
 }
 
 class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
-  bool isObscured = false;
+  bool isCurrentPasswordObscured = true;
+  bool isNewPasswordObscured = true;
+  bool isConfirmPasswordObscured = true;
   bool isFormValid = false;
 
   @override
@@ -76,8 +78,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             elevation: 0,
             title: const Text(
               'Change Password',
-              style:
-              TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),
+              style: TextStyle(
+                  fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),
             ),
             centerTitle: true,
           ),
@@ -93,14 +95,17 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               children: [
                 Text(
                   'Current Password',
-                  style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
+                  style:
+                  TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
                 ),
                 SizedBox(height: 10.h),
                 AppTextFormField(
                   maxLines: 1,
                   hintText: '........',
                   validator: (value) {
-                    if (value == null || value.isEmpty || !AppRegex.isPasswordValid(value)) {
+                    if (value == null ||
+                        value.isEmpty ||
+                        !AppRegex.isPasswordValid(value)) {
                       return 'Enter a valid password';
                     }
                     return null;
@@ -111,26 +116,32 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   suffixIcon: GestureDetector(
                     onTap: () {
                       setState(() {
-                        isObscured = !isObscured;
+                        isCurrentPasswordObscured =
+                        !isCurrentPasswordObscured;
                       });
                     },
                     child: Icon(
-                      isObscured ? Icons.visibility : Icons.visibility_off,
+                      isCurrentPasswordObscured
+                          ? Icons.visibility
+                          : Icons.visibility_off,
                     ),
                   ),
-                  isObscureText: isObscured,
+                  isObscureText: isCurrentPasswordObscured,
                 ),
                 SizedBox(height: 20.h),
                 Text(
                   'New Password',
-                  style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
+                  style:
+                  TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
                 ),
                 SizedBox(height: 10.h),
                 AppTextFormField(
                   maxLines: 1,
                   hintText: '........',
                   validator: (value) {
-                    if (value == null || value.isEmpty || !AppRegex.isPasswordValid(value)) {
+                    if (value == null ||
+                        value.isEmpty ||
+                        !AppRegex.isPasswordValid(value)) {
                       return 'Enter a valid password';
                     }
                     return null;
@@ -141,14 +152,16 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   suffixIcon: GestureDetector(
                     onTap: () {
                       setState(() {
-                        isObscured = !isObscured;
+                        isNewPasswordObscured = !isNewPasswordObscured;
                       });
                     },
                     child: Icon(
-                      isObscured ? Icons.visibility : Icons.visibility_off,
+                      isNewPasswordObscured
+                          ? Icons.visibility
+                          : Icons.visibility_off,
                     ),
                   ),
-                  isObscureText: isObscured,
+                  isObscureText: isNewPasswordObscured,
                 ),
                 SizedBox(height: 10.h),
                 Text(
@@ -158,19 +171,23 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       '\nAt least one lowercase letter.'
                       '\nAt least one number.'
                       '\nAt least one special character (!@#\$&*~)',
-                  style: TextStyle(fontSize: 10.sp, color: Colors.grey, height: 1.5.h),
+                  style: TextStyle(
+                      fontSize: 10.sp, color: Colors.grey, height: 1.5.h),
                 ),
                 SizedBox(height: 20.h),
                 Text(
                   'Confirm Password',
-                  style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w600),
+                  style:
+                  TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w600),
                 ),
                 SizedBox(height: 10.h),
                 AppTextFormField(
                   maxLines: 1,
                   hintText: '........',
                   validator: (value) {
-                    if (value == null || value.isEmpty || !AppRegex.isPasswordValid(value)) {
+                    if (value == null ||
+                        value.isEmpty ||
+                        !AppRegex.isPasswordValid(value)) {
                       return 'Enter a valid password';
                     }
                     return null;
@@ -181,20 +198,24 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   suffixIcon: GestureDetector(
                     onTap: () {
                       setState(() {
-                        isObscured = !isObscured;
+                        isConfirmPasswordObscured =
+                        !isConfirmPasswordObscured;
                       });
                     },
                     child: Icon(
-                      isObscured ? Icons.visibility : Icons.visibility_off,
+                      isConfirmPasswordObscured
+                          ? Icons.visibility
+                          : Icons.visibility_off,
                     ),
                   ),
-                  isObscureText: isObscured,
+                  isObscureText: isConfirmPasswordObscured,
                 ),
                 SizedBox(height: 20.h),
                 BlocConsumer<UserSecurityCubit, UserSecurityStates>(
                   listener: (context, state) {
                     if (state is ChangePasswordSuccessState) {
-                      Navigator.pushReplacementNamed(context, Routes.loginScreen);
+                      Navigator.pushReplacementNamed(
+                          context, Routes.loginScreen);
                     } else if (state is ChangePasswordErrorState) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('❌ ${state.error}')),
@@ -209,7 +230,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     )
                         : AppTextButton(
                       buttonStyle: ButtonStyle(
-                        backgroundColor: WidgetStateProperty.resolveWith<Color>(
+                        backgroundColor:
+                        WidgetStateProperty.resolveWith<Color>(
                               (states) {
                             if (states.contains(WidgetState.disabled)) {
                               return Colors.black54;
@@ -217,7 +239,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                             return Colors.green;
                           },
                         ),
-                        minimumSize: WidgetStateProperty.all(Size(double.infinity, 50.h)),
+                        minimumSize: WidgetStateProperty.all(
+                            Size(double.infinity, 50.h)),
                         shape: WidgetStateProperty.all(
                           RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16.r),
@@ -237,8 +260,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                           }
                         });
                       }
-                          : () {},  // empty function, but then button is enabled, just no-op
-
+                          : () {}, // Disabled button fallback
                       text: Text(
                         'Change Password',
                         style: TextStyle(
@@ -248,7 +270,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         ),
                       ),
                     );
-
                   },
                 ),
               ],

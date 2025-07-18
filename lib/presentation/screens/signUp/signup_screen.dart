@@ -20,6 +20,25 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignUpScreenState extends State<SignUpScreen> {
   bool isObscured = false;
+
+  // Password validation states
+  bool hasMinLength = false;
+  bool hasUppercase = false;
+  bool hasLowercase = false;
+  bool hasNumber = false;
+  bool hasSpecialChar = false;
+
+  // Method to validate password and update states
+  void _validatePassword(String password) {
+    setState(() {
+      hasMinLength = AppRegex.hasMinLength(password);
+      hasUppercase = AppRegex.hasUpperCase(password);
+      hasLowercase = AppRegex.hasLowerCase(password);
+      hasNumber = AppRegex.hasNumber(password);
+      hasSpecialChar = AppRegex.hasSpecialCharacter(password);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var cubit = SignupCubit.get(context);
@@ -101,6 +120,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         inputTextStyle: TextStyles.font15BlackRegular,
                         controller: cubit.passwordController,
                         backgroundColor: Colors.white,
+                        onChanged: (value) {
+                          _validatePassword(value);
+                        },
                         suffixIcon: GestureDetector(
                           onTap: () {
                             setState(() {
@@ -118,7 +140,46 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           }
                         },
                       ),
-                      SizedBox(height: 32.h),
+                      SizedBox(height: 8.h),
+                      // Dynamic password requirements
+                      Padding(
+                        padding: EdgeInsets.only(left: 4.w),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Password must contain:',
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: Colors.grey[600],
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            SizedBox(height: 4.h),
+                            _buildPasswordRequirement(
+                                'At least 8 characters',
+                                hasMinLength
+                            ),
+                            _buildPasswordRequirement(
+                                'One uppercase letter (A-Z)',
+                                hasUppercase
+                            ),
+                            _buildPasswordRequirement(
+                                'One lowercase letter (a-z)',
+                                hasLowercase
+                            ),
+                            _buildPasswordRequirement(
+                                'One number (0-9)',
+                                hasNumber
+                            ),
+                            _buildPasswordRequirement(
+                                'One special character (@\$!%*?&)',
+                                hasSpecialChar
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 24.h),
                       isLoading
                           ? const Center(child: CircularProgressIndicator(color: Colors.blue))
                           : AppTextButton(
@@ -169,6 +230,35 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
         );
       },
+    );
+  }
+
+  // Helper method to build password requirement with dynamic styling
+  Widget _buildPasswordRequirement(String text, bool isValid) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 2.h),
+      child: Row(
+        children: [
+          Icon(
+            isValid ? Icons.check_circle : Icons.radio_button_unchecked,
+            size: 14.sp,
+            color: isValid ? Colors.green : Colors.grey[400],
+          ),
+          SizedBox(width: 8.w),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 12.sp,
+                color: isValid ? Colors.green : Colors.grey[600],
+                decoration: isValid ? TextDecoration.lineThrough : TextDecoration.none,
+                decorationColor: Colors.green,
+                decorationThickness: 1.5,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

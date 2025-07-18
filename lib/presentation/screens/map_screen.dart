@@ -24,12 +24,21 @@ class MapScreen extends StatefulWidget {
   State<MapScreen> createState() => _MapScreenState();
 }
 
-class _MapScreenState extends State<MapScreen> {
+class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
+
   String? sessionToken;
   Position? position;
   CameraPosition? cameraPosition;
   Completer<GoogleMapController> controllerCompleter = Completer();
   bool _isLegendVisible = false;
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _initLocation(); // Retry getting location when user returns to the app
+    }
+  }
+
 
   Future<void> _initLocation() async {
     try {
@@ -53,12 +62,20 @@ class _MapScreenState extends State<MapScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this); // <-- add this
     _initLocation();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       sessionToken = const Uuid().v4();
       MapCubit.get(context).loadMarkersFromFirebase();
     });
   }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +113,10 @@ class _MapScreenState extends State<MapScreen> {
             ),
           if (cameraPosition == null)
             const Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(
+                strokeWidth: 2.5,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+              ),
             ),
           Positioned(
             top: 60.h,
