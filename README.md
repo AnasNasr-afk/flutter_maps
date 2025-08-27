@@ -2,7 +2,11 @@
 
 A focused, community-driven Flutter app enabling citizens to report urban issues (garbage, potholes, broken lights, etc.) using real-time location and map technology, with instant cloud-based submission.
 
+**Now available on the Google Play Store!**  
+[![Download on Play Store](https://img.shields.io/badge/Google%20Play-Download-blue?logo=google-play)](https://play.google.com/store/apps/details?id=com.anasnasr.cairocrew)
+
 [🎥 Watch Demo](https://drive.google.com/file/d/1MPr_NH0U6i03E9jUVXijTPBy_XZlNZv6/view?usp=drivesdk)
+
 ---
 
 ## 🏗️ System Design Overview
@@ -28,7 +32,7 @@ A focused, community-driven Flutter app enabling citizens to report urban issues
 **Typical Flow:**  
 1. User opens the app and authenticates.
 2. User views map centered on current location.
-3. User taps "Report Issue", fills quick form, and attaches photo.
+3. User taps "Report Issue," fills quick form, and attaches photo.
 4. Location is auto-filled; user submits.
 5. Report is uploaded to Firestore (with media in Storage) and appears on the map for authorities.
 
@@ -52,7 +56,6 @@ A focused, community-driven Flutter app enabling citizens to report urban issues
     <img src="assets/screenshots/mapScreenshot.png" alt="Home Screen" width="300"/>
   </div><div style="text-align: center;"><div style="font-weight: bold; margin-bottom: 6px;">Report Issue</div><img src="assets/screenshots/reportIssueScreenshot.png" alt="Report Issue" width="300"/></div><div style="text-align: center;"><div style="font-weight: bold; margin-bottom: 6px;">Admin View</div><img src="assets/screenshots/adminViewScreenshot.png" alt="Admin View" width="300"/></div></div>
 
-
 ---
 
 ## 🛠️ Technologies Used
@@ -72,16 +75,16 @@ A focused, community-driven Flutter app enabling citizens to report urban issues
 - **CI/CD Setup:**  
   Integrated using **GitHub Actions** to automate the build and release process for both Android and iOS.
 
-- **Firebase App Distribution:**
+- **Firebase App Distribution:**  
   - Testers receive an email to download the latest build.
   - Internal QA and stakeholders can easily test new features before release.
   - Supports versioned release notes and crash logs (via Firebase Crashlytics if integrated).
-
 
 ---
 
 ## 💡 Showcase
 
+- **Live on Google Play!** Citizens can now download CairoCrew to report issues directly to city authorities.
 - Instantly report garbage, potholes, or broken infrastructure from anywhere in your city.
 - Attach photos and details—location is auto-captured via GPS.
 - All reports are securely stored in the cloud for city authorities to act upon.
